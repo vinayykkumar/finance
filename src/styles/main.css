@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import our custom styles */
+@import './colors.css';
+@import './animations.css';
+@import './dropdown.css';
+
+/* Custom component styles */
+@layer components {
+  /* Modern Card Styles */
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-card border border-gray-200 dark:border-gray-700 
+           transition-all duration-300 hover:shadow-card-hover;
+  }
+  
+  .card-gradient {
+    @apply relative overflow-hidden rounded-2xl shadow-card transition-all duration-300 hover:shadow-card-hover;
+    background: linear-gradient(135deg, var(--card-gradient-from), var(--card-gradient-to));
+  }
+  
+  .card-glass {
+    @apply bg-glass rounded-2xl shadow-card border border-gray-200/20 dark:border-gray-700/20 
+           backdrop-blur-md transition-all duration-300 hover:shadow-card-hover;
+  }
+  
+  /* Button Styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 font-medium
+           transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500;
+  }
+  
+  .btn-success {
+    @apply bg-success-600 hover:bg-success-700 text-white focus:ring-success-500;
+  }
+  
+  .btn-danger {
+    @apply bg-danger-600 hover:bg-danger-700 text-white focus:ring-danger-500;
+  }
+  
+  .btn-warning {
+    @apply bg-warning-600 hover:bg-warning-700 text-white focus:ring-warning-500;
+  }
+  
+  .btn-info {
+    @apply bg-info-600 hover:bg-info-700 text-white focus:ring-info-500;
+  }
+  
+  .btn-outline {
+    @apply border-2 bg-transparent hover:bg-opacity-10;
+  }
+  
+  .btn-primary-outline {
+    @apply border-primary-600 text-primary-600 hover:bg-primary-600 hover:bg-opacity-10 focus:ring-primary-500;
+  }
+  
+  /* Input Styles */
+  .input {
+    @apply block w-full rounded-xl border-gray-300 dark:border-gray-600 shadow-sm 
+           dark:bg-gray-800 dark:text-white
+           focus:border-primary-500 focus:ring-primary-500 transition-all duration-300;
+  }
+  
+  /* Badge Styles */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300;
+  }
+  
+  .badge-success {
+    @apply bg-success-100 text-success-800 dark:bg-success-900 dark:text-success-300;
+  }
+  
+  .badge-danger {
+    @apply bg-danger-100 text-danger-800 dark:bg-danger-900 dark:text-danger-300;
+  }
+  
+  /* Transition utilities */
+  .transition-bounce {
+    @apply transition-all duration-300 ease-bounce-in;
+  }
+  
+  .transition-smooth {
+    @apply transition-all duration-500 ease-in-out;
+  }
+  
+  /* Dashboard specific styles */
+  .dashboard-container {
+    @apply p-4 md:p-6 max-w-7xl mx-auto animate-fade-in;
+  }
+  
+  .dashboard-card {
+    @apply card p-6;
+  }
+  
+  .dashboard-card-gradient {
+    @apply card-gradient p-6 text-white;
+  }
+  
+  .stat-card {
+    @apply card p-6 hover:translate-y-[-5px] transition-all duration-300;
+  }
+  
+  .stat-value {
+    @apply text-3xl font-bold;
+  }
+  
+  .stat-label {
+    @apply text-sm text-gray-500 dark:text-gray-400;
+  }
+  
+  /* Chart container */
+  .chart-container {
+    @apply h-80 w-full;
+  }
+  
+  /* Progress bars */
+  .progress-bar {
+    @apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden;
+  }
+  
+  .progress-bar-fill {
+    @apply h-2 rounded-full transition-all duration-500;
+  }
+  
+  /* Scrollbar styling */
+  .custom-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 
+           scrollbar-track-transparent hover:scrollbar-thumb-gray-400 
+           dark:hover:scrollbar-thumb-gray-500;
+  }
+}
+
+/* Dark mode overrides */
+.dark .chart-tooltip {
+  background-color: rgba(31, 41, 55, 0.9) !important;
+  color: #f3f4f6 !important;
+  border-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+/* Animation delays for staggered animations */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* Gradient text */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.text-gradient-primary {
+  background-image: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+}
+
+.text-gradient-success {
+  background-image: linear-gradient(135deg, var(--success-500), var(--success-700));
+}
+
+.text-gradient-danger {
+  background-image: linear-gradient(135deg, var(--danger-500), var(--danger-700));
+}
+
+/* Frosted glass effect */
+.frosted-glass {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .frosted-glass {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}

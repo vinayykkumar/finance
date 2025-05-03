@@ -1,0 +1,11 @@
+/* Fix for dropdown options in dark mode */
+.dark option {
+  background-color: #1f2937; /* dark:bg-gray-800 */
+  color: white;
+}
+
+/* Ensure option elements are visible in both light and dark mode */
+option {
+  font-weight: normal;
+  padding: 4px 8px;
+}
