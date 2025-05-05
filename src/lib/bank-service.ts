@@ -4,15 +4,23 @@ export interface Bank {
   id: string;
   name: string;
   balance: number;
+  user_id?: string;
   created_at: string;
 }
 
-export async function getBanks(): Promise<Bank[]> {
+export async function getBanks(userId?: string): Promise<Bank[]> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('banks')
       .select('*')
       .order('created_at', { ascending: true });
+      
+    // Filter by user_id if provided
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching banks:', error);
@@ -26,16 +34,17 @@ export async function getBanks(): Promise<Bank[]> {
   }
 }
 
-export async function addBank(name: string, initialBalance: number): Promise<Bank> {
+export async function addBank(name: string, initialBalance: number, userId?: string): Promise<Bank> {
   try {
-    console.log('Adding bank with:', { name, initialBalance });
+    console.log('Adding bank with:', { name, initialBalance, userId });
 
     const { data, error: insertError } = await supabase
       .from('banks')
       .insert([
         {
           name,
-          balance: initialBalance
+          balance: initialBalance,
+          user_id: userId
         },
       ])
       .select()
@@ -211,12 +220,19 @@ export interface CreditCard {
   created_at: string;
 }
 
-export async function getCreditCards(): Promise<CreditCard[]> {
+export async function getCreditCards(userId?: string): Promise<CreditCard[]> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('credit_cards')
       .select('*')
       .order('created_at', { ascending: true });
+      
+    // Filter by user_id if provided
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching credit cards:', error);
@@ -230,7 +246,7 @@ export async function getCreditCards(): Promise<CreditCard[]> {
   }
 }
 
-export async function addCreditCard(name: string, limit: number): Promise<CreditCard> {
+export async function addCreditCard(name: string, limit: number, userId?: string): Promise<CreditCard> {
   try {
     const { data, error } = await supabase
       .from('credit_cards')
@@ -238,7 +254,8 @@ export async function addCreditCard(name: string, limit: number): Promise<Credit
         {
           name,
           limit,
-          balance: 0
+          balance: 0,
+          user_id: userId
         },
       ])
       .select()

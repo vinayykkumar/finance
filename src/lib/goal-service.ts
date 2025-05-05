@@ -5,9 +5,10 @@ export interface Goal {
   name: string;
   target_amount: number;
   current_amount: number;
-  target_date?: string;
+  target_date: string;
   category_id?: string;
   is_completed: boolean;
+  user_id?: string;
   created_at: string;
 }
 

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { PiggyBank, Plus, Trash2, BarChart2, TrendingUp, ChevronUp, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 // Import types and functions from the real service
-import { BudgetSummaryItem, getBudgets, createBudget, updateBudget, deleteBudget, getBudgetSummary, getBudgetAnalytics, getBudgetRecommendations } from '../lib/budget-service';
-import { getCategories, Category as CategoryType } from '../lib/category-service';
+import { BudgetSummaryItem, getBudgets, createBudget, updateBudget, deleteBudget, getBudgetSummary, getBudgetAnalytics, getBudgetRecommendations } from '../../../lib/budget-service';
+import { getCategories, Category as CategoryType } from '../../../lib/category-service';
 
 interface Budget {
   id: string;
@@ -122,12 +122,12 @@ const BudgetSection: React.FC<BudgetSectionProps> = ({ formatIndianCurrency, sel
     } catch (error) {
       console.error('Error loading budget data:', error);
       
-      // Set default empty arrays if there's an error
+      // Set empty arrays if there's an error
       setBudgets([]);
       setBudgetSummary([]);
       
       // Show error notification to user
-      alert('Failed to load budget data. Using local data instead.');
+      alert('Failed to load budget data from Supabase. Please check your database connection.');
     } finally {
       setLoading(false);
     }

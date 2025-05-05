@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { Category as CategoryType } from '../types';
 
 export interface Category {
   id: string;
@@ -10,12 +11,19 @@ export interface Category {
   created_at: string;
 }
 
-export async function getCategories(): Promise<Category[]> {
+export async function getCategories(userId?: string): Promise<CategoryType[]> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('categories')
       .select('*')
-      .order('name');
+      .order('name', { ascending: true });
+      
+    // Filter by user_id if provided
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching categories:', error);
@@ -24,52 +32,50 @@ export async function getCategories(): Promise<Category[]> {
 
     return data || [];
   } catch (error) {
-    console.error('Error in getCategories:', error);
-    throw error; // Throw error instead of returning empty array for consistency
-  }
-}
-
-export async function createCategory(category: Omit<Category, 'id' | 'created_at'>): Promise<Category> {
-  try {
-    // Log the category data we're trying to insert
-    console.log('Creating category:', {
-      ...category,
-    });
-
-    const { data, error } = await supabase
-      .from('categories')
-      .insert({
-        name: category.name,
-        color: category.color,
-        icon: category.icon,
-        monthly_limit: category.monthly_limit || null,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Failed to create category:', error);
-      throw error;
-    }
-
-    if (!data) {
-      throw new Error('No data returned from insert');
-    }
-
-    console.log('Category created successfully:', data);
-    return data;
-  } catch (error) {
-    console.error('Error in createCategory:', error);
+    console.error('Failed to load categories:', error);
     throw error;
   }
 }
 
-export async function updateCategory(id: string, updates: Partial<Omit<Category, 'id' | 'created_at'>>): Promise<Category> {
+export async function createCategory(category: Partial<CategoryType>, userId?: string): Promise<CategoryType> {
   try {
     const { data, error } = await supabase
       .from('categories')
-      .update(updates)
-      .eq('id', id)
+      .insert([
+        {
+          name: category.name,
+          color: category.color,
+          icon: category.icon,
+          monthly_limit: category.monthly_limit || null,
+          user_id: userId
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding category:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Failed to create category:', error);
+    throw error;
+  }
+}
+
+export async function updateCategory(categoryId: string, updates: Partial<CategoryType>): Promise<CategoryType> {
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .update({
+        name: updates.name,
+        color: updates.color,
+        icon: updates.icon,
+        monthly_limit: updates.monthly_limit,
+      })
+      .eq('id', categoryId)
       .select()
       .single();
 
@@ -78,47 +84,68 @@ export async function updateCategory(id: string, updates: Partial<Omit<Category,
       throw error;
     }
 
-    if (!data) {
-      throw new Error('No data returned from update');
-    }
-
     return data;
   } catch (error) {
-    console.error('Error in updateCategory:', error);
+    console.error('Failed to update category:', error);
     throw error;
   }
 }
 
-export async function deleteCategory(id: string): Promise<void> {
+export async function deleteCategory(categoryId: string): Promise<void> {
   try {
     const { error } = await supabase
       .from('categories')
       .delete()
-      .eq('id', id);
-    if (error) throw error;
+      .eq('id', categoryId);
+
+    if (error) {
+      console.error('Error deleting category:', error);
+      throw error;
+    }
   } catch (error) {
-    console.error('Error deleting category:', error);
+    console.error('Failed to delete category:', error);
     throw error;
   }
 }
 
-export async function getCategoryExpenses(categoryId: string, month: Date): Promise<number> {
-  // Get total expenses for this category in the given month
-  const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
-  const endOfMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+export async function getCategoryExpenses(categoryId: string, date: Date, userId?: string): Promise<number> {
+  try {
+    // Get month start and end dates
+    const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+    const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-  const { data, error } = await supabase
-    .from('transactions')
-    .select('amount')
-    .eq('category_id', categoryId)
-    .eq('type', 'expense')
-    .gte('date', startOfMonth.toISOString().split('T')[0])
-    .lte('date', endOfMonth.toISOString().split('T')[0]);
+    // Format dates for Supabase query
+    const startDate = monthStart.toISOString().split('T')[0];
+    const endDate = monthEnd.toISOString().split('T')[0];
 
-  if (error) throw error;
-  
-  // Sum up all expenses
-  return (data || []).reduce((total, tx) => total + Number(tx.amount), 0);
+    // Build query
+    let query = supabase
+      .from('transactions')
+      .select('amount')
+      .eq('category_id', categoryId)
+      .eq('type', 'expense')
+      .gte('date', startDate)
+      .lte('date', endDate);
+      
+    // Filter by user_id if provided
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error fetching category expenses:', error);
+      throw error;
+    }
+
+    // Sum up all expenses
+    const totalExpense = data.reduce((sum, transaction) => sum + transaction.amount, 0);
+    return totalExpense;
+  } catch (error) {
+    console.error('Failed to get category expenses:', error);
+    throw error;
+  }
 }
 
 export async function checkCategoryLimit(categoryId: string, amount: number): Promise<{

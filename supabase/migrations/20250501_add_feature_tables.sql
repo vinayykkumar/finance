@@ -80,11 +80,3 @@ GROUP BY month
 ORDER BY month DESC;
 
 -- Add RPC function for updating bank balance (to prevent race conditions)
-CREATE OR REPLACE FUNCTION update_bank_balance(bank_id UUID, amount_change DECIMAL)
-RETURNS void AS $$
-BEGIN
-  UPDATE banks
-  SET balance = balance + amount_change
-  WHERE id = bank_id;
-END;
-$$ LANGUAGE plpgsql;

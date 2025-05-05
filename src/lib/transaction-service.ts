@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { Transaction as TransactionType } from '../types';
 import { updateBankBalance } from './bank-service';
 
 export interface Transaction {
@@ -14,7 +15,7 @@ export interface Transaction {
   created_at: string;
 }
 
-export async function createTransaction(transaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction> {
+export async function createTransaction(transaction: TransactionType | Omit<TransactionType, 'id' | 'created_at'>): Promise<TransactionType> {
   try {
     // Input validation - description is now optional
     
@@ -28,10 +29,6 @@ export async function createTransaction(transaction: Omit<Transaction, 'id' | 'c
     
     if (transaction.type === 'transfer' && !transaction.to_bank_id) {
       throw new Error('Destination account is required for transfers');
-    }
-    
-    if (transaction.type === 'expense' && !transaction.category_id) {
-      throw new Error('Category is required for expenses');
     }
     
     const amount = Math.abs(transaction.amount);
@@ -77,25 +74,32 @@ export async function createTransaction(transaction: Omit<Transaction, 'id' | 'c
       // For regular transactions
       const { data, error } = await supabase
         .from('transactions')
-        .insert({
-          description: transaction.description,
-          amount: transaction.amount,
-          type: transaction.type,
-          category_id: transaction.category_id || null,
-          date: transaction.date,
-          bank_id: transaction.bank_id
-        })
+        .insert([
+          {
+            description: transaction.description,
+            amount: transaction.amount,
+            type: transaction.type,
+            category_id: transaction.category_id,
+            date: transaction.date,
+            bank_id: transaction.bank_id,
+            to_bank_id: transaction.to_bank_id,
+            user_id: transaction.user_id,
+          },
+        ])
         .select()
         .single();
 
       if (error) throw error;
       if (!data) throw new Error('No data returned from insert');
 
-      // Update bank balance
-      if (transaction.type === 'expense') {
-        await updateBankBalance(transaction.bank_id, -amount);
-      } else if (transaction.type === 'income') {
-        await updateBankBalance(transaction.bank_id, amount);
+      // Update bank balance(s) based on transaction type
+      if (transaction.type === 'income') {
+        await updateBankBalance(transaction.bank_id, Number(transaction.amount));
+      } else if (transaction.type === 'expense') {
+        await updateBankBalance(transaction.bank_id, -Number(transaction.amount));
+      } else if (transaction.type === 'transfer' && transaction.to_bank_id) {
+        await updateBankBalance(transaction.bank_id, -Number(transaction.amount));
+        await updateBankBalance(transaction.to_bank_id, Number(transaction.amount));
       }
       
       // No need to manually update category spending here
@@ -140,14 +144,13 @@ export async function deleteTransaction(id: string): Promise<void> {
     }
 
     // Reverse the balance changes
-    const amount = Math.abs(transaction.amount);
-    if (transaction.type === 'expense') {
-      await updateBankBalance(transaction.bank_id, amount);
-    } else if (transaction.type === 'income') {
-      await updateBankBalance(transaction.bank_id, -amount);
+    if (transaction.type === 'income') {
+      await updateBankBalance(transaction.bank_id, -Number(transaction.amount));
+    } else if (transaction.type === 'expense') {
+      await updateBankBalance(transaction.bank_id, Number(transaction.amount));
     } else if (transaction.type === 'transfer' && transaction.to_bank_id) {
-      await updateBankBalance(transaction.bank_id, amount);
-      await updateBankBalance(transaction.to_bank_id, -amount);
+      await updateBankBalance(transaction.bank_id, Number(transaction.amount));
+      await updateBankBalance(transaction.to_bank_id, -Number(transaction.amount));
     }
 
     console.log('Transaction deleted successfully');
@@ -163,12 +166,19 @@ export async function deleteTransaction(id: string): Promise<void> {
   }
 }
 
-export async function getTransactions(): Promise<Transaction[]> {
+export async function getTransactions(userId?: string): Promise<TransactionType[]> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('transactions')
       .select('*')
       .order('date', { ascending: false });
+    
+    // Filter by user_id if provided
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+    
+    const { data, error } = await query;
 
     if (error) {
       console.error('Error fetching transactions:', error);
@@ -178,6 +188,6 @@ export async function getTransactions(): Promise<Transaction[]> {
     return data || [];
   } catch (error) {
     console.error('Failed to load transactions:', error);
-    throw error; // Throw error instead of returning empty array for consistency
+    throw error;
   }
 }

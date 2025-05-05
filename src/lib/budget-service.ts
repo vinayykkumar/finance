@@ -16,40 +16,25 @@ export interface BudgetSummaryItem {
   percentage: number;
 }
 
-// Local fallback data
-const localBudgetData: Budget[] = [];
-
 export async function getBudgets(month: Date): Promise<Budget[]> {
   try {
     const startOfMonth = new Date(month.getFullYear(), month.getMonth(), 1);
     const formattedMonth = startOfMonth.toISOString().split('T')[0];
 
-    // Check if budgets table exists
-    try {
-      const { data, error } = await supabase
-        .from('budgets')
-        .select('*')
-        .eq('month', formattedMonth);
+    const { data, error } = await supabase
+      .from('budgets')
+      .select('*')
+      .eq('month', formattedMonth);
 
-      if (error) {
-        // If the error is about the table not existing, return local data
-        if (error.message.includes('does not exist')) {
-          console.error('Budgets table does not exist:', error);
-          return localBudgetData;
-        }
-        console.error('Error fetching budgets:', error);
-        throw error;
-      }
-
-      return data || [];
-    } catch (error) {
-      console.error('Error in getBudgets:', error);
-      // Return empty array as fallback
-      return localBudgetData;
+    if (error) {
+      console.error('Error fetching budgets:', error);
+      throw error;
     }
+
+    return data || [];
   } catch (error) {
     console.error('Error in getBudgets:', error);
-    return localBudgetData;
+    throw error;
   }
 }
 
@@ -171,61 +156,40 @@ export async function getBudgetSummary(month: Date): Promise<BudgetSummaryItem[]
     const formattedMonth = startOfMonth.toISOString().split('T')[0];
 
     // Get all budgets for the month
-    let budgets: { id: string; category_id: string; amount: number }[] = [];
-    try {
-      const { data: budgetsData, error: budgetError } = await supabase
-        .from('budgets')
-        .select('id, category_id, amount')
-        .eq('month', formattedMonth);
+    const { data: budgets, error: budgetError } = await supabase
+      .from('budgets')
+      .select('id, category_id, amount')
+      .eq('month', formattedMonth);
 
-      if (budgetError) {
-        // If the error is about the table not existing, use empty array
-        if (budgetError.message.includes('does not exist')) {
-          console.error('Budgets table does not exist:', budgetError);
-          budgets = [];
-        } else {
-          console.error('Error fetching budgets:', budgetError);
-          throw budgetError;
-        }
-      } else {
-        budgets = budgetsData || [];
-      }
-    } catch (error) {
-      console.error('Error fetching budgets:', error);
-      budgets = [];
+    if (budgetError) {
+      console.error('Error fetching budgets:', budgetError);
+      throw budgetError;
     }
 
     // Get all expense transactions for the month grouped by category
-    let expenses: { category_id: string; amount: number }[] = [];
-    try {
-      const { data: expensesData, error: expenseError } = await supabase
-        .from('transactions')
-        .select('category_id, amount')
-        .eq('type', 'expense')
-        .gte('date', startDate)
-        .lte('date', endDate)
-        .not('category_id', 'is', null);
+    const { data: expenses, error: expenseError } = await supabase
+      .from('transactions')
+      .select('category_id, amount')
+      .eq('type', 'expense')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .not('category_id', 'is', null);
 
-      if (expenseError) {
-        console.error('Error fetching expenses:', expenseError);
-        throw expenseError;
-      }
-      expenses = expensesData || [];
-    } catch (error) {
-      console.error('Error fetching expenses:', error);
-      expenses = [];
+    if (expenseError) {
+      console.error('Error fetching expenses:', expenseError);
+      throw expenseError;
     }
 
     // Calculate spending by category
     const spendingByCategory: Record<string, number> = {};
-    expenses.forEach(expense => {
+    (expenses || []).forEach(expense => {
       if (expense.category_id) {
         spendingByCategory[expense.category_id] = (spendingByCategory[expense.category_id] || 0) + Number(expense.amount);
       }
     });
 
     // Create summary
-    const summary = budgets.map(budget => {
+    const summary = (budgets || []).map(budget => {
       const spent = spendingByCategory[budget.category_id] || 0;
       const remaining = Number(budget.amount) - spent;
       const percentage = Number(budget.amount) > 0 ? (spent / Number(budget.amount)) * 100 : 0;
@@ -242,7 +206,7 @@ export async function getBudgetSummary(month: Date): Promise<BudgetSummaryItem[]
     return summary;
   } catch (error) {
     console.error('Error in getBudgetSummary:', error);
-    return [];
+    throw error;
   }
 }
 

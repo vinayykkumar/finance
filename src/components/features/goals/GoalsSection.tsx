@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Plus, Trash2, Target, DollarSign } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
-import MotionButton from './MotionButton';
-import { Goal, getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../lib/goal-service';
+import MotionButton from '../../../components/ui/MotionButton';
+import { Goal } from '../../../types';
+import { getGoals, createGoal, updateGoal, deleteGoal, contributeToGoal } from '../../../lib/goal-service';
 
 interface Category {
   id: string;
@@ -132,7 +133,7 @@ const GoalsSection: React.FC<GoalsSectionProps> = ({ formatIndianCurrency }) => 
         name: newGoal.name.trim(),
         target_amount: newGoal.target_amount,
         current_amount: newGoal.current_amount || 0,
-        target_date: newGoal.target_date || undefined,
+        target_date: newGoal.target_date || format(new Date(new Date().setMonth(new Date().getMonth() + 6)), 'yyyy-MM-dd'),
         category_id: newGoal.category_id || undefined,
         is_completed: false
       };
