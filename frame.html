@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Finance Tracker</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { margin: 5px; padding: 8px; }
+    #transactions { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>💰 Finance Tracker (₹)</h2>
+
+  <form id="transactionForm">
+    <input type="text" id="description" placeholder="Description" required />
+    <input type="number" id="amount" placeholder="Amount (₹)" required />
+    <input type="date" id="date" required />
+    <button type="submit">Add Transaction</button>
+  </form>
+
+  <div id="transactions"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
