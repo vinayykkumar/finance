@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpDown, Trash2, TrendingUp, TrendingDown, X, Plus,
-  SortAsc, SortDesc, ArrowUpCircle, ArrowDownCircle, Filter,
+  SortAsc, SortDesc, ArrowUpCircle, ArrowDownCircle, Filter, Search,
   Brain
 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -212,11 +212,11 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
         </div>
         
         {/* Search Bar */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50">
           <SearchBar
             placeholder="Search transactions, banks, or categories..."
             onSearch={setSearchQuery}
-            className="max-w-md"
+            className="w-full max-w-lg"
           />
         </div>
         
