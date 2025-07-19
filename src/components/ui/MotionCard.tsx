@@ -16,20 +16,18 @@ const MotionCard: React.FC<MotionCardProps> = ({
 }) => {
   return (
     <motion.div
-      className={`bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 
-                shadow-sm hover:shadow-md transition-all duration-200 
-                hover:-translate-y-1 relative overflow-hidden ${className}`}
+      className={`card-pixelbin hover:-translate-y-2 relative overflow-hidden ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.3,
+        duration: 0.4,
         delay: delay,
-        ease: "easeOut"
+        ease: [0.4, 0, 0.2, 1]
       }}
       whileHover={{ 
-        scale: 1.01,
-        y: -2,
-        transition: { duration: 0.2 }
+        scale: 1.02,
+        y: -4,
+        transition: { duration: 0.3 }
       }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}

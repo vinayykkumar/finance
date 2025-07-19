@@ -190,14 +190,14 @@ const Dashboard: React.FC<DashboardProps> = ({
     >
       {/* Month Display at Top */}
       <motion.div 
-        className="relative mb-8 text-center p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
+        className="relative mb-8 text-center p-8 card-glass"
         variants={cardVariants}
       >
         <div>
-          <h2 className="text-2xl font-bold text-gradient-primary">
+          <h2 className="text-3xl font-black text-gradient-hero">
             {format(selectedMonth, "MMMM yyyy")}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-base font-medium text-gray-600 dark:text-gray-400 mt-3">
             Financial Summary
           </p>
         </div>
@@ -205,43 +205,44 @@ const Dashboard: React.FC<DashboardProps> = ({
       
       {/* Total Balance Highlight Card */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 p-8 rounded-xl shadow-lg glow-primary mb-8 text-white"
+        className="card-hero mb-8 neon-primary"
         variants={cardVariants}
         whileHover={{ 
-          scale: 1.005,
-          boxShadow: "0 20px 40px -12px rgba(6, 182, 212, 0.4)"
+          scale: 1.01,
+          y: -4,
+          boxShadow: "0 25px 50px -12px rgba(14, 165, 233, 0.4)"
         }}
       >
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-white/90 mb-2">Total Balance</h2>
-            <p className="text-4xl font-bold text-white">
+            <h2 className="text-xl font-bold text-white/90 mb-3">Total Balance</h2>
+            <p className="text-5xl font-black text-white mb-2">
               {formatIndianCurrency(banks.reduce((sum, bank) => sum + Number(bank.balance), 0))}
             </p>
-            <div className="mt-4 flex items-center text-sm">
+            <div className="flex items-center text-sm font-medium">
               {balanceChange.isPositive ? (
                 <ArrowUp className="h-4 w-4 mr-1 text-white/80" />
               ) : (
                 <ArrowDown className="h-4 w-4 mr-1 text-white/80" />
               )}
-              <span className="font-medium text-white/80">
+              <span className="font-bold text-white/90">
                 {balanceChange.isPositive ? '+' : '-'}{balanceChange.value}%
               </span>
-              <span className="ml-1 text-white/60">from last month</span>
+              <span className="ml-2 text-white/70">from last month</span>
             </div>
           </div>
-          <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-            <Wallet className="h-12 w-12 text-white" />
+          <div className="p-5 bg-white/20 rounded-2xl backdrop-blur-sm border border-white/30">
+            <Wallet className="h-14 w-14 text-white drop-shadow-lg" />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-4 mt-6">
+        <div className="flex flex-wrap gap-4 mt-8">
           {banks.map((bank) => (
-            <div key={bank.id} className="bg-white/15 backdrop-blur-sm p-3 rounded-lg flex items-center gap-3">
-              <div className="w-1 h-8 rounded-full bg-white/60"></div>
+            <div key={bank.id} className="bg-white/15 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3 border border-white/20">
+              <div className="w-1 h-10 rounded-full bg-white/70"></div>
               <div>
-                <p className="text-xs font-medium text-white/80">{bank.name}</p>
-                <p className="text-lg font-semibold text-white">{formatIndianCurrency(bank.balance)}</p>
+                <p className="text-xs font-bold text-white/80 uppercase tracking-wide">{bank.name}</p>
+                <p className="text-lg font-black text-white">{formatIndianCurrency(bank.balance)}</p>
               </div>
             </div>
           ))}
@@ -251,82 +252,82 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <motion.div 
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
+          className="card-pixelbin p-8 glow-success"
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.01,
-            y: -2
+            scale: 1.02,
+            y: -4
           }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Total Income</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">Total Income</p>
+              <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
                 {formatIndianCurrency(totalIncome)}
               </p>
             </div>
-            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
-              <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+            <div className="p-4 bg-emerald-100/80 dark:bg-emerald-900/30 rounded-2xl border border-emerald-200/50 dark:border-emerald-700/50">
+              <TrendingUp className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-6 flex items-center text-sm font-medium">
             {incomeChange.isPositive ? (
               <ArrowUp className="h-4 w-4 mr-1 text-emerald-500" />
             ) : (
               <ArrowDown className="h-4 w-4 mr-1 text-red-500" />
             )}
-            <span className={`font-medium ${incomeChange.isPositive ? "text-emerald-600" : "text-red-600"}`}>
+            <span className={`font-bold ${incomeChange.isPositive ? "text-emerald-600" : "text-red-600"}`}>
               {incomeChange.isPositive ? '+' : '-'}{incomeChange.value}%
             </span>
-            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
+            <span className="ml-2 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
         </motion.div>
 
         <motion.div 
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
+          className="card-pixelbin p-8 glow-danger"
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.01,
-            y: -2
+            scale: 1.02,
+            y: -4
           }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Total Expenses</p>
+              <p className="text-3xl font-black text-gray-900 dark:text-white mt-2">
                 {formatIndianCurrency(totalExpenses)}
               </p>
             </div>
-            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
-              <TrendingDown className="h-6 w-6 text-red-600 dark:text-red-400" />
+            <div className="p-4 bg-red-100/80 dark:bg-red-900/30 rounded-2xl border border-red-200/50 dark:border-red-700/50">
+              <TrendingDown className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-6 flex items-center text-sm font-medium">
             {/* For expenses, increasing is bad (red), decreasing is good (green) */}
             {expensesChange.isPositive ? (
               <ArrowUp className="h-4 w-4 mr-1 text-red-500" />
             ) : (
               <ArrowDown className="h-4 w-4 mr-1 text-emerald-500" />
             )}
-            <span className={`font-medium ${expensesChange.isPositive ? "text-red-600" : "text-emerald-600"}`}>
+            <span className={`font-bold ${expensesChange.isPositive ? "text-red-600" : "text-emerald-600"}`}>
               {expensesChange.isPositive ? '+' : '-'}{expensesChange.value}%
             </span>
-            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
+            <span className="ml-2 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
         </motion.div>
 
         <motion.div 
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
+          className={`card-pixelbin p-8 ${netSavings >= 0 ? 'glow-success' : 'glow-danger'}`}
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.01,
-            y: -2
+            scale: 1.02,
+            y: -4
           }}
         >
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Net Savings</p>
-              <p className={`text-2xl font-bold mt-1 ${
+              <p className="text-sm font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wide">Net Savings</p>
+              <p className={`text-3xl font-black mt-2 ${
                 netSavings >= 0 
                   ? "text-emerald-600 dark:text-emerald-400" 
                   : "text-red-600 dark:text-red-400"
@@ -334,31 +335,31 @@ const Dashboard: React.FC<DashboardProps> = ({
                 {formatIndianCurrency(netSavings)}
               </p>
             </div>
-            <div className={`p-3 rounded-lg ${
+            <div className={`p-4 rounded-2xl border ${
               netSavings >= 0 
-                ? "bg-emerald-100 dark:bg-emerald-900/30" 
-                : "bg-red-100 dark:bg-red-900/30"
+                ? "bg-emerald-100/80 dark:bg-emerald-900/30 border-emerald-200/50 dark:border-emerald-700/50" 
+                : "bg-red-100/80 dark:bg-red-900/30 border-red-200/50 dark:border-red-700/50"
             }`}>
-              <PiggyBank className={`h-6 w-6 ${
+              <PiggyBank className={`h-8 w-8 ${
                 netSavings >= 0 
                   ? "text-emerald-600 dark:text-emerald-400" 
                   : "text-red-600 dark:text-red-400"
               }`} />
             </div>
           </div>
-          <div className="mt-4 flex items-center text-sm">
+          <div className="mt-6 flex items-center text-sm font-medium">
             {netSavingsChange.isPositive ? (
               <>
                 <ArrowUp className="h-4 w-4 mr-1 text-emerald-500" />
-                <span className="text-emerald-600 font-medium">+{netSavingsChange.value}%</span>
+                <span className="text-emerald-600 font-bold">+{netSavingsChange.value}%</span>
               </>
             ) : (
               <>
                 <ArrowDown className="h-4 w-4 mr-1 text-red-500" />
-                <span className="text-red-600 font-medium">-{netSavingsChange.value}%</span>
+                <span className="text-red-600 font-bold">-{netSavingsChange.value}%</span>
               </>
             )}
-            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
+            <span className="ml-2 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
         </motion.div>
       </div>
@@ -367,14 +368,14 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         {/* Monthly Income vs Expenses Chart */}
         <motion.div 
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
+          className="card-pixelbin p-8"
           variants={cardVariants}
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 h-4 w-1 rounded-full mr-3" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <span className="bg-gradient-to-r from-sky-500 to-blue-500 h-5 w-1.5 rounded-full mr-4" />
             Income vs Expenses
           </h3>
-          <div className="h-80">
+          <div className="h-80 p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl">
             <AnimatedChart
               data={monthlyTrendData}
               type="bar"
@@ -387,14 +388,14 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         {/* Top Spending Categories Chart */}
         <motion.div 
-          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
+          className="card-pixelbin p-8"
           variants={cardVariants}
         >
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-            <span className="bg-gradient-to-r from-purple-500 to-violet-500 h-4 w-1 rounded-full mr-3" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+            <span className="bg-gradient-to-r from-purple-500 to-pink-500 h-5 w-1.5 rounded-full mr-4" />
             Top Spending Categories
           </h3>
-          <div className="h-80">
+          <div className="h-80 p-4 bg-gray-50/50 dark:bg-white/5 rounded-xl">
             <AnimatedChart
               data={categoryChartData}
               type="bar"
@@ -408,15 +409,15 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       {/* Recent Transactions Section */}
       <motion.div 
-        className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm mb-8"
+        className="card-pixelbin p-8 mb-8"
         variants={cardVariants}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
-            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 h-4 w-1 rounded-full mr-3" />
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center">
+            <span className="bg-gradient-to-r from-sky-500 to-blue-500 h-5 w-1.5 rounded-full mr-4" />
             Recent Transactions
           </h3>
-          <button className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-200">
+          <button className="btn-primary text-sm">
             View All
           </button>
         </div>
@@ -424,39 +425,39 @@ const Dashboard: React.FC<DashboardProps> = ({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-800">
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Description</th>
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Category</th>
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Date</th>
-                <th className="pb-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Amount</th>
+              <tr className="border-b border-gray-200/50 dark:border-white/10">
+                <th className="pb-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                <th className="pb-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                <th className="pb-4 text-left text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                <th className="pb-4 text-right text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
               </tr>
             </thead>
             <tbody>
               {filteredTransactions.slice(0, 5).map((transaction) => (
-                <tr key={transaction.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200">
-                  <td className="py-4 whitespace-nowrap">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">{transaction.description}</span>
+                <tr key={transaction.id} className="border-b border-gray-100/50 dark:border-white/5 hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors duration-300">
+                  <td className="py-5 whitespace-nowrap">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">{transaction.description}</span>
                   </td>
-                  <td className="py-4 whitespace-nowrap">
+                  <td className="py-5 whitespace-nowrap">
                     {transaction.category_id && (
                       <div className="flex items-center">
                         <div 
-                          className="w-2 h-2 rounded-full mr-2" 
+                          className="w-3 h-3 rounded-full mr-3 shadow-sm" 
                           style={{ 
                             backgroundColor: categories.find(c => c.id === transaction.category_id)?.color || '#6366F1' 
                           }}
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
                           {categories.find(c => c.id === transaction.category_id)?.name || 'Uncategorized'}
                         </span>
                       </div>
                     )}
                   </td>
-                  <td className="py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{format(new Date(transaction.date), "MMM dd, yyyy")}</span>
+                  <td className="py-5 whitespace-nowrap">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{format(new Date(transaction.date), "MMM dd, yyyy")}</span>
                   </td>
-                  <td className="py-4 whitespace-nowrap text-right">
-                    <span className={`text-sm font-medium ${
+                  <td className="py-5 whitespace-nowrap text-right">
+                    <span className={`text-sm font-bold ${
                       transaction.type === 'income' 
                         ? 'text-green-600 dark:text-green-400' 
                         : transaction.type === 'expense'

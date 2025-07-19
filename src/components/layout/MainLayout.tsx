@@ -78,18 +78,20 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-all duration-300 ${
-      darkMode 
-        ? 'bg-gray-950' 
-        : 'bg-gray-50'
+    <div className={`min-h-screen animated-bg relative ${
+      darkMode ? 'dark' : ''
     }`}>
+      {/* Floating orbs background */}
+      <div className="floating-orbs">
+        <div className="floating-orb"></div>
+        <div className="floating-orb"></div>
+        <div className="floating-orb"></div>
+      </div>
+      
       {/* Header */}
       <motion.header 
-        className={`sticky top-0 z-30 border-b transition-all duration-300 ${
-          darkMode 
-            ? 'bg-gray-900/80 border-gray-800 backdrop-blur-xl' 
-            : 'bg-white/80 border-gray-200 backdrop-blur-xl'
-        }`}
+        className="sticky top-0 z-30 border-b border-gray-200/50 dark:border-white/10 
+                   bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl transition-all duration-300"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -98,11 +100,9 @@ const MainLayout: React.FC = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`md:hidden p-2 rounded-lg transition-all duration-200 ${
-                darkMode 
-                  ? 'hover:bg-gray-800 text-gray-400 hover:text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
-              }`}
+              className="md:hidden p-3 rounded-xl bg-white/50 dark:bg-white/10 hover:bg-white/70 dark:hover:bg-white/15 
+                         text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white 
+                         border border-gray-200/50 dark:border-white/20 backdrop-blur-xl transition-all duration-200"
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -113,16 +113,14 @@ const MainLayout: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <div className="bg-gradient-to-r from-cyan-500 to-blue-500 p-3 rounded-xl shadow-lg glow-primary">
+              <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-3 rounded-xl shadow-lg neon-primary">
                 <Wallet className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gradient-primary">
+                <h1 className="text-xl font-black text-gradient-hero">
                   FinTrack
                 </h1>
-                <p className={`text-xs font-medium ${
-                  darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
                   Personal Finance Manager
                 </p>
               </div>
@@ -131,11 +129,9 @@ const MainLayout: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <motion.div 
-              className={`hidden sm:block px-4 py-2 rounded-lg text-sm font-medium border ${
-                darkMode 
-                  ? 'bg-gray-800 border-gray-700 text-gray-200' 
-                  : 'bg-white border-gray-200 text-gray-700'
-              }`}
+              className="hidden sm:block px-4 py-2 rounded-xl text-sm font-semibold 
+                         bg-white/80 dark:bg-white/10 border border-gray-200/50 dark:border-white/20 
+                         text-gray-700 dark:text-gray-200 backdrop-blur-xl"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
@@ -145,11 +141,10 @@ const MainLayout: React.FC = () => {
             
             <motion.button
               onClick={toggleDarkMode}
-              className={`p-3 rounded-lg transition-all duration-200 border ${
-                darkMode 
-                  ? 'bg-gray-800 border-gray-700 text-yellow-400 hover:bg-gray-700' 
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-              } hover:scale-105`}
+              className="p-3 rounded-xl transition-all duration-300 border 
+                         bg-white/80 dark:bg-white/10 border-gray-200/50 dark:border-white/20 
+                         text-gray-600 dark:text-yellow-400 hover:bg-white/90 dark:hover:bg-white/15 
+                         backdrop-blur-xl hover:scale-105 hover:-translate-y-1"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, rotate: -180 }}
@@ -178,9 +173,9 @@ const MainLayout: React.FC = () => {
 
         {/* Sidebar */}
         <motion.div
-          className={`fixed md:relative z-50 md:z-auto ${
+          className={`fixed md:relative z-50 md:z-auto transition-transform duration-300 ease-in-out ${
             mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          } transition-transform duration-300 ease-in-out`}
+          }`}
           initial={{ x: -300 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -191,9 +186,8 @@ const MainLayout: React.FC = () => {
             onItemClick={handleTabChange}
             isOpen={mobileMenuOpen}
             darkMode={darkMode}
-            className={`h-[calc(100vh-5rem)] border-r ${
-              darkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-            }`}
+            className="h-[calc(100vh-5rem)] border-r border-gray-200/50 dark:border-white/10 
+                       bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl"
           >
             <CompactMonthSelector
               selectedMonth={selectedMonth}
@@ -205,9 +199,7 @@ const MainLayout: React.FC = () => {
 
         {/* Main Content */}
         <motion.main 
-          className={`flex-1 p-6 overflow-auto ${
-            darkMode ? 'bg-gray-950' : 'bg-gray-50'
-          }`}
+          className="flex-1 p-6 overflow-auto main-content"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
@@ -227,6 +219,7 @@ const MainLayout: React.FC = () => {
           </div>
         </motion.main>
       </div>
+    </div>
     </div>
   );
 };
