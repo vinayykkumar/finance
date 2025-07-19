@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpDown, Trash2, TrendingUp, TrendingDown, X, Plus,
-  SortAsc, SortDesc, ArrowUpCircle, ArrowDownCircle, Filter
+  SortAsc, SortDesc, ArrowUpCircle, ArrowDownCircle, Filter,
   Brain
 } from 'lucide-react';
 import { format } from 'date-fns';
