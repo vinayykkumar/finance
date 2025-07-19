@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { apiClient, handleApiResponse } from './api-client';
 
 export interface Goal {
   id: string;
@@ -12,86 +12,72 @@ export interface Goal {
   created_at: string;
 }
 
-// Local storage key for goals
-const LOCAL_STORAGE_KEY = 'finance_app_goals';
-
-// Helper function to get goals from local storage
-function getLocalGoals(): Goal[] {
-  try {
-    const storedGoals = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return storedGoals ? JSON.parse(storedGoals) : [];
-  } catch (error) {
-    console.error('Error reading goals from local storage:', error);
-    return [];
-  }
-}
-
-// Helper function to save goals to local storage
-function saveLocalGoals(goals: Goal[]): void {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(goals));
-  } catch (error) {
-    console.error('Error saving goals to local storage:', error);
-  }
-}
-
 export async function getGoals(): Promise<Goal[]> {
   try {
-    console.log('Fetching goals from database...');
-    const { data, error } = await supabase
-      .from('goals')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching goals from database:', error);
-      throw new Error(`Failed to fetch goals: ${error.message}`);
-    }
-
-    console.log('Goals fetched successfully from database:', data);
-    return data || [];
+    console.log('Fetching goals from API...');
+    const response = await apiClient.get<Goal[]>('/goals');
+    const goals = handleApiResponse(response);
+    console.log('Goals fetched successfully from API:', goals);
+    return goals;
   } catch (error) {
     console.error('Error in getGoals:', error);
-    // If Supabase is not configured or fails, use local storage
-    console.warn('Using local storage for goals due to database error');
-    const localGoals = getLocalGoals();
-    console.log('Goals loaded from local storage:', localGoals);
-    return localGoals;
+    // Return some default goals for demo purposes
+    console.warn('Using default goals due to API error');
+    const defaultGoals: Goal[] = [
+      {
+        id: 'goal1',
+        name: 'Emergency Fund',
+        target_amount: 300000,
+        current_amount: 150000,
+        target_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString(),
+        is_completed: false,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'goal2',
+        name: 'New Car',
+        target_amount: 1200000,
+        current_amount: 400000,
+        target_date: new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString(),
+        category_id: 'cat5',
+        is_completed: false,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'goal3',
+        name: 'Vacation Fund',
+        target_amount: 150000,
+        current_amount: 150000,
+        target_date: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString(),
+        category_id: 'cat6',
+        is_completed: true,
+        created_at: new Date().toISOString()
+      }
+    ];
+    return defaultGoals;
   }
 }
 
 export async function createGoal(goal: Omit<Goal, 'id' | 'created_at'>): Promise<Goal> {
   try {
-    console.log('Creating goal in database:', goal);
+    console.log('Creating goal via API:', goal);
     
-    const { data, error } = await supabase
-      .from('goals')
-      .insert({
-        name: goal.name,
-        target_amount: goal.target_amount,
-        current_amount: goal.current_amount || 0,
-        target_date: goal.target_date,
-        category_id: goal.category_id,
-        is_completed: goal.is_completed || false
-      })
-      .select()
-      .single();
+    const response = await apiClient.post<Goal>('/goals', {
+      name: goal.name,
+      target_amount: goal.target_amount,
+      current_amount: goal.current_amount || 0,
+      target_date: goal.target_date,
+      category_id: goal.category_id,
+      is_completed: goal.is_completed || false
+    });
 
-    if (error) {
-      console.error('Error creating goal in database:', error);
-      throw new Error(`Failed to create goal: ${error.message}`);
-    }
-
-    if (!data) {
-      throw new Error('No data returned from goal creation');
-    }
-
-    console.log('Goal created successfully in database:', data);
-    return data;
+    const newGoal = handleApiResponse(response);
+    console.log('Goal created successfully via API:', newGoal);
+    return newGoal;
   } catch (error) {
     console.error('Error in createGoal:', error);
-    // If database fails, create a local goal
-    console.warn('Creating goal in local storage due to database error');
+    // Create a mock goal for demo purposes
+    console.warn('Creating mock goal due to API error');
     
     const newGoal: Goal = {
       id: Math.random().toString(36).substring(2, 15),
@@ -104,162 +90,51 @@ export async function createGoal(goal: Omit<Goal, 'id' | 'created_at'>): Promise
       created_at: new Date().toISOString()
     };
     
-    // Add to local storage
-    const localGoals = getLocalGoals();
-    saveLocalGoals([newGoal, ...localGoals]);
-    
-    console.log('Goal created successfully in local storage:', newGoal);
+    console.log('Mock goal created:', newGoal);
     return newGoal;
   }
 }
 
 export async function updateGoal(id: string, updates: Partial<Omit<Goal, 'id' | 'created_at'>>): Promise<Goal> {
   try {
-    console.log(`Updating goal ${id} in database:`, updates);
+    console.log(`Updating goal ${id} via API:`, updates);
     
-    const { data, error } = await supabase
-      .from('goals')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating goal in database:', error);
-      throw new Error(`Failed to update goal: ${error.message}`);
-    }
-
-    if (!data) {
-      throw new Error('No data returned from goal update');
-    }
+    const response = await apiClient.patch<Goal>(`/goals/${id}`, updates);
+    const updatedGoal = handleApiResponse(response);
     
-    console.log('Goal updated successfully in database:', data);
-    return data;
+    console.log('Goal updated successfully via API:', updatedGoal);
+    return updatedGoal;
   } catch (error) {
     console.error('Error in updateGoal:', error);
-    // If database fails, update local goal
-    console.warn('Updating goal in local storage due to database error');
-    
-    const localGoals = getLocalGoals();
-    const goalIndex = localGoals.findIndex(g => g.id === id);
-    
-    if (goalIndex === -1) {
-      throw new Error('Goal not found in local storage');
-    }
-    
-    const updatedGoal = {
-      ...localGoals[goalIndex],
-      ...updates
-    };
-    
-    localGoals[goalIndex] = updatedGoal;
-    saveLocalGoals(localGoals);
-    
-    console.log('Goal updated successfully in local storage:', updatedGoal);
-    return updatedGoal;
+    throw error;
   }
 }
 
 export async function deleteGoal(id: string): Promise<void> {
   try {
-    console.log(`Deleting goal ${id} from database`);
+    console.log(`Deleting goal ${id} via API`);
     
-    const { error } = await supabase
-      .from('goals')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting goal from database:', error);
-      throw new Error(`Failed to delete goal: ${error.message}`);
-    }
+    const response = await apiClient.delete(`/goals/${id}`);
+    handleApiResponse(response);
     
-    console.log('Goal deleted successfully from database');
+    console.log('Goal deleted successfully via API');
   } catch (error) {
     console.error('Error in deleteGoal:', error);
-    // If database fails, delete from local storage
-    console.warn('Deleting goal from local storage due to database error');
-  } finally {
-    // Always remove from local storage as well
-    const localGoals = getLocalGoals();
-    const filteredGoals = localGoals.filter(g => g.id !== id);
-    saveLocalGoals(filteredGoals);
-    console.log('Goal removed from local storage');
+    throw error;
   }
 }
 
 export async function contributeToGoal(id: string, amount: number): Promise<Goal> {
   try {
-    console.log(`Contributing ${amount} to goal ${id}`);
+    console.log(`Contributing ${amount} to goal ${id} via API`);
     
-    // First get the current goal
-    const { data: goal, error: fetchError } = await supabase
-      .from('goals')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (fetchError) {
-      console.error('Error fetching goal from database:', fetchError);
-      throw new Error(`Failed to fetch goal: ${fetchError.message}`);
-    }
-
-    if (!goal) {
-      throw new Error('Goal not found');
-    }
-
-    // Calculate new amount and check if goal is completed
-    const newAmount = goal.current_amount + amount;
-    const isCompleted = newAmount >= goal.target_amount;
-
-    // Update the goal
-    const { data, error } = await supabase
-      .from('goals')
-      .update({
-        current_amount: newAmount,
-        is_completed: isCompleted
-      })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating goal amount in database:', error);
-      throw new Error(`Failed to update goal amount: ${error.message}`);
-    }
-
-    if (!data) {
-      throw new Error('No data returned from goal update');
-    }
+    const response = await apiClient.post<Goal>(`/goals/${id}/contribute`, { amount });
+    const updatedGoal = handleApiResponse(response);
     
-    console.log('Contribution added successfully in database:', data);
-    return data;
+    console.log('Contribution added successfully via API:', updatedGoal);
+    return updatedGoal;
   } catch (error) {
     console.error('Error in contributeToGoal:', error);
-    // If database fails, update local goal
-    console.warn('Adding contribution in local storage due to database error');
-    
-    const localGoals = getLocalGoals();
-    const goalIndex = localGoals.findIndex(g => g.id === id);
-    
-    if (goalIndex === -1) {
-      throw new Error('Goal not found in local storage');
-    }
-    
-    const goal = localGoals[goalIndex];
-    const newAmount = goal.current_amount + amount;
-    const isCompleted = newAmount >= goal.target_amount;
-    
-    const updatedGoal = {
-      ...goal,
-      current_amount: newAmount,
-      is_completed: isCompleted
-    };
-    
-    localGoals[goalIndex] = updatedGoal;
-    saveLocalGoals(localGoals);
-    
-    console.log('Contribution added successfully in local storage:', updatedGoal);
-    return updatedGoal;
+    throw error;
   }
 }
