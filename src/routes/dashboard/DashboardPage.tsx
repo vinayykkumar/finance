@@ -1,11 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, TrendingUp, ArrowUpDown } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useData } from '../../providers/DataProvider';
 import Dashboard from '../../components/features/dashboard/Dashboard';
 import AIInsightsPanel from '../../components/features/ai/AIInsightsPanel';
 import SearchBar from '../../components/ui/SearchBar';
-import QuickStats from '../../components/ui/QuickStats';
 
 interface DashboardPageProps {
   selectedMonth: Date;
@@ -33,47 +32,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ selectedMonth }) => {
     setShowSearchResults(true);
   };
 
-  // Calculate quick stats
-  const currentMonthTransactions = transactions.filter(t => {
-    const date = new Date(t.date);
-    return date.getMonth() === selectedMonth.getMonth() && 
-           date.getFullYear() === selectedMonth.getFullYear();
-  });
-
-  const totalIncome = currentMonthTransactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpenses = currentMonthTransactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const quickStats = [
-    {
-      label: 'Total Balance',
-      value: formatIndianCurrency(banks.reduce((sum, bank) => sum + bank.balance, 0)),
-      icon: <TrendingUp className="h-5 w-5" />,
-      color: 'blue' as const
-    },
-    {
-      label: 'This Month Income',
-      value: formatIndianCurrency(totalIncome),
-      icon: <ArrowUpDown className="h-5 w-5" />,
-      color: 'green' as const
-    },
-    {
-      label: 'This Month Expenses',
-      value: formatIndianCurrency(totalExpenses),
-      icon: <ArrowUpDown className="h-5 w-5" />,
-      color: 'red' as const
-    },
-    {
-      label: 'Net Savings',
-      value: formatIndianCurrency(totalIncome - totalExpenses),
-      icon: <TrendingUp className="h-5 w-5" />,
-      color: 'purple' as const
-    }
-  ];
 
   return (
     <div className="space-y-8">
@@ -145,9 +103,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ selectedMonth }) => {
             )}
           </div>
         </div>
-        
-        {/* Quick Stats */}
-        <QuickStats stats={quickStats} />
       </motion.div>
 
       <Dashboard 
