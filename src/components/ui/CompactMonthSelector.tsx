@@ -12,7 +12,7 @@ interface CompactMonthSelectorProps {
 const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
   selectedMonth,
   onChange,
-  darkMode = false,
+  darkMode = true,
 }) => {
   const handlePreviousMonth = () => {
     onChange(subMonths(selectedMonth, 1));
@@ -29,27 +29,27 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
       transition={{ duration: 0.3 }}
       className={`w-full ${
         darkMode 
-          ? 'bg-gray-800/50 border border-gray-700/50' 
-          : 'bg-white/80 border border-gray-200/50'
-      } backdrop-filter backdrop-blur-sm rounded-xl overflow-hidden`}
+          ? 'bg-white/5 border border-white/10' 
+          : 'bg-white border border-gray-200'
+      } backdrop-blur-xl rounded-xl overflow-hidden`}
     >
-      <div className="px-3 py-2 flex justify-between items-center border-b border-gray-700/20 dark:border-gray-700/20">
+      <div className="px-4 py-3 flex justify-between items-center border-b border-white/10">
         <span className={`flex items-center gap-1.5 text-xs ${
-          darkMode ? 'text-gray-400' : 'text-gray-500'
+          darkMode ? 'text-gray-400' : 'text-gray-600'
         }`}>
           <Calendar size={12} />
           <span>Current Month</span>
         </span>
       </div>
       
-      <div className="px-3 pb-3">
+      <div className="px-4 py-4">
         <div className="flex items-center justify-between">
           <button
             onClick={handlePreviousMonth}
             className={`p-1.5 rounded-full ${
               darkMode
-                ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300' 
-                : 'bg-gray-200/50 hover:bg-gray-200 text-gray-600'
+                ? 'bg-white/10 hover:bg-white/20 text-gray-300' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
             } transition-colors`}
           >
             <ChevronLeft size={16} />
@@ -64,14 +64,14 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
             className="text-center relative"
           >
             <h3 className={`text-base font-semibold ${
-              darkMode ? 'text-white' : 'text-gray-900'
+              darkMode ? 'text-white' : 'text-gray-800'
             }`}>
               {format(selectedMonth, 'MMMM yyyy')}
             </h3>
             
             {/* Subtle glow effect under the month */}
             <div className={`absolute inset-x-0 bottom-0 h-1 rounded-full 
-              ${darkMode ? 'bg-indigo-600/40' : 'bg-indigo-500/40'} blur-sm mx-auto w-1/2`}
+              ${darkMode ? 'bg-sky-500/40' : 'bg-sky-500/40'} blur-sm mx-auto w-1/2`}
             />
           </motion.div>
           
@@ -79,8 +79,8 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
             onClick={handleNextMonth}
             className={`p-1.5 rounded-full ${
               darkMode
-                ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300' 
-                : 'bg-gray-200/50 hover:bg-gray-200 text-gray-600'
+                ? 'bg-white/10 hover:bg-white/20 text-gray-300' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
             } transition-colors`}
           >
             <ChevronRight size={16} />
@@ -101,10 +101,10 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
                 className={`py-1 px-1 text-xs rounded ${
                   isSelected
                     ? darkMode
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-indigo-500 text-white'
+                      ? 'bg-sky-500 text-white'
+                      : 'bg-sky-500 text-white'
                     : darkMode
-                      ? 'bg-gray-700/40 text-gray-300 hover:bg-gray-700'
+                      ? 'bg-white/10 text-gray-300 hover:bg-white/20'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 } transition-colors`}
               >
