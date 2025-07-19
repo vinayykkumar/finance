@@ -65,7 +65,7 @@ const MainLayout: React.FC = () => {
       case 'accounts':
         return <AccountsPage />;
       case 'transactions':
-        return <TransactionsPage selectedMonth={selectedMonth} />;
+        return <TransactionsPage selectedMonth={selectedMonth} searchQuery={globalSearchQuery} />;
       case 'categories':
         return <CategoriesPage />;
       case 'budgets':

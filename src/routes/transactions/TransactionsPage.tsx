@@ -48,7 +48,14 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [showSmartForm, setShowSmartForm] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(externalSearchQuery || '');
+
+  // Update local search when external search changes
+  React.useEffect(() => {
+    if (externalSearchQuery !== undefined) {
+      setSearchQuery(externalSearchQuery);
+    }
+  }, [externalSearchQuery]);
 
   // Filter transactions for the selected month
   const filteredTransactions = useMemo(() => {
