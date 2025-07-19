@@ -190,198 +190,176 @@ const Dashboard: React.FC<DashboardProps> = ({
     >
       {/* Month Display at Top */}
       <motion.div 
-        className="relative mb-8 text-center p-4 backdrop-filter backdrop-blur-sm rounded-2xl overflow-hidden border dark:border-gray-700/50 border-gray-200/70"
+        className="relative mb-8 text-center p-6 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
         variants={cardVariants}
-        whileHover={{ scale: 1.01 }}
       >
-        <div className="relative z-10">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-500 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
+        <div>
+          <h2 className="text-2xl font-bold text-gradient-primary">
             {format(selectedMonth, "MMMM yyyy")}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
             Financial Summary
           </p>
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-xl z-0" />
-        <div className="absolute -left-8 -top-8 w-32 h-32 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-xl z-0" />
       </motion.div>
       
       {/* Total Balance Highlight Card */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-800 dark:via-purple-800 dark:to-pink-800 p-10 rounded-3xl shadow-2xl border border-white/20 backdrop-filter backdrop-blur-xl mb-8 text-white"
+        className="relative overflow-hidden bg-gradient-to-r from-cyan-500 to-blue-500 p-8 rounded-xl shadow-lg glow-primary mb-8 text-white"
         variants={cardVariants}
         whileHover={{ 
-          scale: 1.01,
-          boxShadow: "0 25px 50px -12px rgba(79, 70, 229, 0.4)"
+          scale: 1.005,
+          boxShadow: "0 20px 40px -12px rgba(6, 182, 212, 0.4)"
         }}
       >
-        <div className="flex items-center justify-between relative z-10">
+        <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white/95 mb-3 tracking-wide">Total Balance</h2>
-            <p className="text-5xl font-black bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent drop-shadow-lg">
+            <h2 className="text-xl font-semibold text-white/90 mb-2">Total Balance</h2>
+            <p className="text-4xl font-bold text-white">
               {formatIndianCurrency(banks.reduce((sum, bank) => sum + Number(bank.balance), 0))}
             </p>
-            <div className="mt-6 flex items-center text-base">
+            <div className="mt-4 flex items-center text-sm">
               {balanceChange.isPositive ? (
-                <ArrowUp className="h-5 w-5 mr-2 text-green-300" />
+                <ArrowUp className="h-4 w-4 mr-1 text-white/80" />
               ) : (
-                <ArrowDown className="h-5 w-5 mr-2 text-red-300" />
+                <ArrowDown className="h-4 w-4 mr-1 text-white/80" />
               )}
-              <span className={`font-bold ${balanceChange.isPositive ? "text-green-300" : "text-red-300"}`}>
+              <span className="font-medium text-white/80">
                 {balanceChange.isPositive ? '+' : '-'}{balanceChange.value}%
               </span>
-              <span className="ml-2 text-white/80 font-medium">from last month</span>
+              <span className="ml-1 text-white/60">from last month</span>
             </div>
           </div>
-          <div className="p-6 bg-white/20 rounded-3xl backdrop-blur-md shadow-xl">
-            <Wallet className="h-16 w-16 text-white drop-shadow-lg" />
+          <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
+            <Wallet className="h-12 w-12 text-white" />
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-6 mt-8 relative z-10">
+        <div className="flex flex-wrap gap-4 mt-6">
           {banks.map((bank) => (
-            <div key={bank.id} className="bg-white/15 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4 shadow-lg border border-white/10">
-              <div className="w-1 h-10 rounded-full bg-gradient-to-b from-white/60 to-white/30"></div>
+            <div key={bank.id} className="bg-white/15 backdrop-blur-sm p-3 rounded-lg flex items-center gap-3">
+              <div className="w-1 h-8 rounded-full bg-white/60"></div>
               <div>
-                <p className="text-sm font-semibold text-white/90">{bank.name}</p>
-                <p className="text-xl font-bold text-white">{formatIndianCurrency(bank.balance)}</p>
+                <p className="text-xs font-medium text-white/80">{bank.name}</p>
+                <p className="text-lg font-semibold text-white">{formatIndianCurrency(bank.balance)}</p>
               </div>
             </div>
           ))}
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute -right-16 -bottom-20 w-80 h-80 bg-gradient-to-r from-pink-400/30 to-purple-400/30 rounded-full blur-3xl z-0" />
-        <div className="absolute -left-16 -top-20 w-80 h-80 bg-gradient-to-r from-blue-400/30 to-indigo-400/30 rounded-full blur-3xl z-0" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-yellow-400/10 to-orange-400/10 rounded-full blur-3xl z-0" />
       </motion.div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <motion.div 
-          className="relative overflow-hidden glass-card p-8 rounded-3xl shadow-2xl border border-emerald-200/30 dark:border-emerald-700/30"
+          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.03,
-            boxShadow: "0 25px 50px -12px rgba(16, 185, 129, 0.25)"
+            scale: 1.01,
+            y: -2
           }}
         >
-          <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Total Income</p>
-              <p className="text-3xl font-black bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 bg-clip-text text-transparent mt-2 drop-shadow-sm">
+              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Total Income</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {formatIndianCurrency(totalIncome)}
               </p>
             </div>
-            <div className="p-4 bg-gradient-to-br from-emerald-400/40 to-green-500/40 dark:from-emerald-400/30 dark:to-emerald-600/30 rounded-3xl shadow-xl backdrop-blur-sm">
-              <TrendingUp className="h-8 w-8 text-emerald-600 dark:text-emerald-400 drop-shadow-sm" />
+            <div className="p-3 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg">
+              <TrendingUp className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
-          <div className="mt-6 flex items-center text-sm relative z-10">
+          <div className="mt-4 flex items-center text-sm">
             {incomeChange.isPositive ? (
-              <ArrowUp className="h-4 w-4 mr-2 text-emerald-500" />
+              <ArrowUp className="h-4 w-4 mr-1 text-emerald-500" />
             ) : (
-              <ArrowDown className="h-4 w-4 mr-2 text-rose-500" />
+              <ArrowDown className="h-4 w-4 mr-1 text-red-500" />
             )}
-            <span className={`font-bold ${incomeChange.isPositive ? "text-emerald-600" : "text-rose-600"}`}>
+            <span className={`font-medium ${incomeChange.isPositive ? "text-emerald-600" : "text-red-600"}`}>
               {incomeChange.isPositive ? '+' : '-'}{incomeChange.value}%
             </span>
-            <span className="ml-2 text-gray-600 dark:text-gray-400 font-medium">from last month</span>
+            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-gradient-to-r from-emerald-400/20 to-green-400/20 rounded-full blur-2xl z-0" />
-          <div className="absolute -left-8 -top-8 w-32 h-32 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-full blur-2xl z-0" />
         </motion.div>
 
         <motion.div 
-          className="relative overflow-hidden glass-card p-8 rounded-3xl shadow-2xl border border-rose-200/30 dark:border-rose-700/30"
+          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.03,
-            boxShadow: "0 25px 50px -12px rgba(244, 63, 94, 0.25)"
+            scale: 1.01,
+            y: -2
           }}
         >
-          <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Total Expenses</p>
-              <p className="text-3xl font-black bg-gradient-to-r from-rose-500 via-red-500 to-pink-500 bg-clip-text text-transparent mt-2 drop-shadow-sm">
+              <p className="text-sm font-medium text-red-600 dark:text-red-400">Total Expenses</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                 {formatIndianCurrency(totalExpenses)}
               </p>
             </div>
-            <div className="p-4 bg-gradient-to-br from-rose-400/40 to-red-500/40 dark:from-rose-400/30 dark:to-rose-600/30 rounded-3xl shadow-xl backdrop-blur-sm">
-              <TrendingDown className="h-8 w-8 text-rose-600 dark:text-rose-400 drop-shadow-sm" />
+            <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <TrendingDown className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
           </div>
-          <div className="mt-6 flex items-center text-sm relative z-10">
+          <div className="mt-4 flex items-center text-sm">
             {/* For expenses, increasing is bad (red), decreasing is good (green) */}
             {expensesChange.isPositive ? (
-              <ArrowUp className="h-4 w-4 mr-2 text-rose-500" />
+              <ArrowUp className="h-4 w-4 mr-1 text-red-500" />
             ) : (
-              <ArrowDown className="h-4 w-4 mr-2 text-emerald-500" />
+              <ArrowDown className="h-4 w-4 mr-1 text-emerald-500" />
             )}
-            <span className={`font-bold ${expensesChange.isPositive ? "text-rose-600" : "text-emerald-600"}`}>
+            <span className={`font-medium ${expensesChange.isPositive ? "text-red-600" : "text-emerald-600"}`}>
               {expensesChange.isPositive ? '+' : '-'}{expensesChange.value}%
             </span>
-            <span className="ml-2 text-gray-600 dark:text-gray-400 font-medium">from last month</span>
+            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-gradient-to-r from-rose-400/20 to-red-400/20 rounded-full blur-2xl z-0" />
-          <div className="absolute -left-8 -top-8 w-32 h-32 bg-gradient-to-r from-pink-400/20 to-rose-400/20 rounded-full blur-2xl z-0" />
         </motion.div>
 
         <motion.div 
-          className="relative overflow-hidden glass-card p-8 rounded-3xl shadow-2xl border border-blue-200/30 dark:border-blue-700/30"
+          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-200"
           variants={cardVariants}
           whileHover={{ 
-            scale: 1.03,
-            boxShadow: "0 25px 50px -12px rgba(59, 130, 246, 0.25)"
+            scale: 1.01,
+            y: -2
           }}
         >
-          <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Net Savings</p>
+              <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Net Savings</p>
               <p className={`text-2xl font-bold mt-1 ${
                 netSavings >= 0 
-                  ? "text-3xl font-black bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 bg-clip-text text-transparent drop-shadow-sm" 
-                  : "text-3xl font-black bg-gradient-to-r from-rose-500 via-pink-500 to-red-500 bg-clip-text text-transparent drop-shadow-sm"
+                  ? "text-emerald-600 dark:text-emerald-400" 
+                  : "text-red-600 dark:text-red-400"
               }`}>
                 {formatIndianCurrency(netSavings)}
               </p>
             </div>
-            <div className={`p-3 rounded-2xl shadow-inner ${
+            <div className={`p-3 rounded-lg ${
               netSavings >= 0 
-                ? "p-4 bg-gradient-to-br from-emerald-400/40 to-teal-500/40 dark:from-emerald-400/30 dark:to-teal-600/30 rounded-3xl shadow-xl backdrop-blur-sm" 
-                : "p-4 bg-gradient-to-br from-rose-400/40 to-pink-500/40 dark:from-rose-400/30 dark:to-pink-600/30 rounded-3xl shadow-xl backdrop-blur-sm"
+                ? "bg-emerald-100 dark:bg-emerald-900/30" 
+                : "bg-red-100 dark:bg-red-900/30"
             }`}>
               <PiggyBank className={`h-6 w-6 ${
                 netSavings >= 0 
-                  ? "h-8 w-8 text-emerald-600 dark:text-emerald-400 drop-shadow-sm" 
-                  : "h-8 w-8 text-rose-600 dark:text-rose-400 drop-shadow-sm"
+                  ? "text-emerald-600 dark:text-emerald-400" 
+                  : "text-red-600 dark:text-red-400"
               }`} />
             </div>
           </div>
-          <div className="mt-6 flex items-center text-sm relative z-10">
+          <div className="mt-4 flex items-center text-sm">
             {netSavingsChange.isPositive ? (
               <>
-                <ArrowUp className="h-4 w-4 mr-2 text-emerald-500" />
-                <span className="text-emerald-600 font-bold">+{netSavingsChange.value}%</span>
+                <ArrowUp className="h-4 w-4 mr-1 text-emerald-500" />
+                <span className="text-emerald-600 font-medium">+{netSavingsChange.value}%</span>
               </>
             ) : (
               <>
-                <ArrowDown className="h-4 w-4 mr-2 text-rose-500" />
-                <span className="text-rose-600 font-bold">-{netSavingsChange.value}%</span>
+                <ArrowDown className="h-4 w-4 mr-1 text-red-500" />
+                <span className="text-red-600 font-medium">-{netSavingsChange.value}%</span>
               </>
             )}
-            <span className="ml-2 text-gray-600 dark:text-gray-400 font-medium">from last month</span>
+            <span className="ml-1 text-gray-500 dark:text-gray-400">from last month</span>
           </div>
-          
-          {/* Decorative elements */}
-          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-2xl z-0" />
-          <div className="absolute -left-8 -top-8 w-32 h-32 bg-gradient-to-r from-teal-400/20 to-blue-400/20 rounded-full blur-2xl z-0" />
         </motion.div>
       </div>
 
@@ -389,15 +367,11 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         {/* Monthly Income vs Expenses Chart */}
         <motion.div 
-          className="relative overflow-hidden bg-gradient-to-br from-white/30 to-white/10 dark:from-gray-800/40 dark:to-gray-800/20 p-6 rounded-3xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 backdrop-filter backdrop-blur-md"
+          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
           variants={cardVariants}
-          whileHover={{ 
-            scale: 1.01,
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
-          }}
         >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-            <span className="bg-gradient-to-r from-blue-500 to-cyan-400 h-5 w-1 rounded-full mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 h-4 w-1 rounded-full mr-3" />
             Income vs Expenses
           </h3>
           <div className="h-80">
@@ -409,22 +383,15 @@ const Dashboard: React.FC<DashboardProps> = ({
               isDarkMode={document.documentElement.classList.contains('dark')}
             />
           </div>
-          {/* Decorative elements */}
-          <div className="absolute -right-12 -bottom-12 w-32 h-32 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-2xl z-0" />
-          <div className="absolute -left-12 -top-12 w-32 h-32 bg-cyan-400/10 dark:bg-cyan-600/10 rounded-full blur-2xl z-0" />
         </motion.div>
 
         {/* Top Spending Categories Chart */}
         <motion.div 
-          className="relative overflow-hidden bg-gradient-to-br from-white/30 to-white/10 dark:from-gray-800/40 dark:to-gray-800/20 p-6 rounded-3xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 backdrop-filter backdrop-blur-md"
+          className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
           variants={cardVariants}
-          whileHover={{ 
-            scale: 1.01,
-            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
-          }}
         >
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-            <span className="bg-gradient-to-r from-purple-500 to-pink-400 h-5 w-1 rounded-full mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+            <span className="bg-gradient-to-r from-purple-500 to-violet-500 h-4 w-1 rounded-full mr-3" />
             Top Spending Categories
           </h3>
           <div className="h-80">
@@ -436,46 +403,39 @@ const Dashboard: React.FC<DashboardProps> = ({
               isDarkMode={document.documentElement.classList.contains('dark')}
             />
           </div>
-          {/* Decorative elements */}
-          <div className="absolute -right-12 -bottom-12 w-32 h-32 bg-purple-400/10 dark:bg-purple-600/10 rounded-full blur-2xl z-0" />
-          <div className="absolute -left-12 -top-12 w-32 h-32 bg-pink-400/10 dark:bg-pink-600/10 rounded-full blur-2xl z-0" />
         </motion.div>
       </div>
 
       {/* Recent Transactions Section */}
       <motion.div 
-        className="relative overflow-hidden bg-gradient-to-br from-white/30 to-white/10 dark:from-gray-800/40 dark:to-gray-800/20 p-6 rounded-3xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 backdrop-filter backdrop-blur-md mb-8"
+        className="bg-white dark:bg-gray-900 p-6 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm mb-8"
         variants={cardVariants}
-        whileHover={{ 
-          scale: 1.005,
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
-        }}
       >
-        <div className="flex items-center justify-between mb-6 relative z-10">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
-            <span className="bg-gradient-to-r from-indigo-500 to-blue-400 h-5 w-1 rounded-full mr-2" />
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+            <span className="bg-gradient-to-r from-cyan-500 to-blue-500 h-4 w-1 rounded-full mr-3" />
             Recent Transactions
           </h3>
-          <button className="px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full shadow-sm hover:from-indigo-600 hover:to-blue-600 transition-all duration-200">
+          <button className="px-3 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-200">
             View All
           </button>
         </div>
 
-        <div className="overflow-x-auto relative z-10">
+        <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700/50">
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
-                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
-                <th className="pb-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+              <tr className="border-b border-gray-200 dark:border-gray-800">
+                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Description</th>
+                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Category</th>
+                <th className="pb-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Date</th>
+                <th className="pb-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Amount</th>
               </tr>
             </thead>
             <tbody>
               {filteredTransactions.slice(0, 5).map((transaction) => (
-                <tr key={transaction.id} className="border-b border-gray-100 dark:border-gray-800/50 hover:bg-white/30 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                <tr key={transaction.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors duration-200">
                   <td className="py-4 whitespace-nowrap">
-                    <span className="font-medium text-gray-800 dark:text-gray-200">{transaction.description}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{transaction.description}</span>
                   </td>
                   <td className="py-4 whitespace-nowrap">
                     {transaction.category_id && (
@@ -486,14 +446,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                             backgroundColor: categories.find(c => c.id === transaction.category_id)?.color || '#6366F1' 
                           }}
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
                           {categories.find(c => c.id === transaction.category_id)?.name || 'Uncategorized'}
                         </span>
                       </div>
                     )}
                   </td>
                   <td className="py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">{format(new Date(transaction.date), "MMM dd, yyyy")}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{format(new Date(transaction.date), "MMM dd, yyyy")}</span>
                   </td>
                   <td className="py-4 whitespace-nowrap text-right">
                     <span className={`text-sm font-medium ${
@@ -501,7 +461,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         ? 'text-green-600 dark:text-green-400' 
                         : transaction.type === 'expense'
                           ? 'text-red-600 dark:text-red-400'
-                          : 'text-indigo-600 dark:text-indigo-400'
+                          : 'text-cyan-600 dark:text-cyan-400'
                     }`}>
                       {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
                       {formatIndianCurrency(transaction.amount)}
@@ -512,10 +472,6 @@ const Dashboard: React.FC<DashboardProps> = ({
             </tbody>
           </table>
         </div>
-        
-        {/* Decorative elements */}
-        <div className="absolute -right-12 -bottom-12 w-40 h-40 bg-indigo-400/10 dark:bg-indigo-600/10 rounded-full blur-2xl z-0" />
-        <div className="absolute -left-12 -top-12 w-40 h-40 bg-blue-400/10 dark:bg-blue-600/10 rounded-full blur-2xl z-0" />
       </motion.div>
     </motion.div>
   );
