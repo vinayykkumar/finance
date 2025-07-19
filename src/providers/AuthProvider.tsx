@@ -1,18 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  name?: string;
-}
+import { signIn, signUp, signOut, getCurrentUser, resetPassword, refreshSession, resetAuthState } from '../lib/auth-service';
+import { User, AuthSession } from '../types';
 
 interface AuthContextType {
+  // Auth state
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
-  loading: boolean;
+  session: AuthSession;
+  isAuthenticated: boolean;
+  
+  // Auth methods
+  signIn: (email: string, password: string) => Promise<{ user: User | null; error: any }>;
+  signUp: (email: string, password: string, fullName: string) => Promise<{ user: User | null; error: any }>;
+  signOut: () => Promise<{ error: any }>;
+  resetPassword: (email: string) => Promise<{ error: any }>;
+  refreshSession: () => Promise<{ user: User | null; error: any }>;
+  resetAuthState: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,63 +33,199 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [session, setSession] = useState<AuthSession>({
+    user: null,
+    session: null,
+    isLoading: true
+  });
+
+  const isAuthenticated = !!user && !!session.session;
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('auth_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    initializeAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    setLoading(true);
+  const initializeAuth = async () => {
     try {
-      // Mock login - in real app this would call your auth API
-      const mockUser = { id: '1', email, name: email.split('@')[0] };
-      setUser(mockUser);
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      console.log('AuthProvider: Initializing auth...');
+      setSession(prev => ({ ...prev, isLoading: true }));
+      
+      const { user: currentUser, error } = await getCurrentUser();
+      
+      if (error) {
+        console.error('AuthProvider: Error getting current user:', error);
+        setUser(null);
+        setSession({
+          user: null,
+          session: null,
+          isLoading: false
+        });
+        return;
+      }
+      
+      if (currentUser) {
+        console.log('AuthProvider: User found:', currentUser.email);
+        setUser(currentUser);
+        setSession({
+          user: currentUser,
+          session: { user: currentUser }, // Mock session object
+          isLoading: false
+        });
+      } else {
+        console.log('AuthProvider: No user found');
+        setUser(null);
+        setSession({
+          user: null,
+          session: null,
+          isLoading: false
+        });
+      }
     } catch (error) {
-      throw new Error('Login failed');
-    } finally {
-      setLoading(false);
+      console.error('AuthProvider: Exception during auth initialization:', error);
+      setUser(null);
+      setSession({
+        user: null,
+        session: null,
+        isLoading: false
+      });
     }
   };
 
-  const signup = async (email: string, password: string, name?: string) => {
-    setLoading(true);
+  const handleSignIn = async (email: string, password: string) => {
     try {
-      // Mock signup - in real app this would call your auth API
-      const mockUser = { id: '1', email, name: name || email.split('@')[0] };
-      setUser(mockUser);
-      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+      console.log('AuthProvider: Signing in user:', email);
+      const result = await signIn(email, password);
+      
+      if (result.user && !result.error) {
+        setUser(result.user);
+        setSession({
+          user: result.user,
+          session: { user: result.user },
+          isLoading: false
+        });
+      }
+      
+      return result;
     } catch (error) {
-      throw new Error('Signup failed');
-    } finally {
-      setLoading(false);
+      console.error('AuthProvider: Sign in error:', error);
+      return { user: null, error };
     }
   };
 
-  const logout = async () => {
-    setUser(null);
-    localStorage.removeItem('auth_user');
+  const handleSignUp = async (email: string, password: string, fullName: string) => {
+    try {
+      console.log('AuthProvider: Signing up user:', email);
+      const result = await signUp(email, password, fullName);
+      
+      if (result.user && !result.error) {
+        setUser(result.user);
+        setSession({
+          user: result.user,
+          session: { user: result.user },
+          isLoading: false
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('AuthProvider: Sign up error:', error);
+      return { user: null, error };
+    }
   };
 
-  const resetPassword = async (email: string) => {
-    // Mock password reset - in real app this would call your auth API
-    console.log('Password reset requested for:', email);
+  const handleSignOut = async () => {
+    try {
+      console.log('AuthProvider: Signing out user');
+      const result = await signOut();
+      
+      setUser(null);
+      setSession({
+        user: null,
+        session: null,
+        isLoading: false
+      });
+      
+      return result;
+    } catch (error) {
+      console.error('AuthProvider: Sign out error:', error);
+      return { error };
+    }
   };
 
-  const value = {
+  const handleResetPassword = async (email: string) => {
+    try {
+      console.log('AuthProvider: Resetting password for:', email);
+      return await resetPassword(email);
+    } catch (error) {
+      console.error('AuthProvider: Reset password error:', error);
+      return { error };
+    }
+  };
+
+  const handleRefreshSession = async () => {
+    try {
+      console.log('AuthProvider: Refreshing session');
+      setSession(prev => ({ ...prev, isLoading: true }));
+      
+      const result = await refreshSession();
+      
+      if (result.user && !result.error) {
+        setUser(result.user);
+        setSession({
+          user: result.user,
+          session: { user: result.user },
+          isLoading: false
+        });
+      } else {
+        setUser(null);
+        setSession({
+          user: null,
+          session: null,
+          isLoading: false
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('AuthProvider: Refresh session error:', error);
+      setSession(prev => ({ ...prev, isLoading: false }));
+      return { user: null, error };
+    }
+  };
+
+  const handleResetAuthState = () => {
+    try {
+      console.log('AuthProvider: Resetting auth state');
+      resetAuthState();
+      setUser(null);
+      setSession({
+        user: null,
+        session: null,
+        isLoading: false
+      });
+      
+      // Reload the page to ensure clean state
+      window.location.reload();
+    } catch (error) {
+      console.error('AuthProvider: Error resetting auth state:', error);
+    }
+  };
+
+  const value: AuthContextType = {
     user,
-    login,
-    signup,
-    logout,
-    resetPassword,
-    loading,
+    session,
+    isAuthenticated,
+    signIn: handleSignIn,
+    signUp: handleSignUp,
+    signOut: handleSignOut,
+    resetPassword: handleResetPassword,
+    refreshSession: handleRefreshSession,
+    resetAuthState: handleResetAuthState,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
