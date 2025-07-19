@@ -10,7 +10,7 @@ interface ApiResponse<T> {
 class ApiClient {
   private baseURL: string;
 
-  constructor(baseURL: string = 'http://localhost:3001/api') {
+  constructor(baseURL: string = import.meta.env.VITE_API_URL || 'http://localhost:3001/api') {
     this.baseURL = baseURL;
   }
 
