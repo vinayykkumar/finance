@@ -141,7 +141,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ selectedMonth }) => {
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
@@ -165,4 +165,4 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ selectedMonth }) => {
   );
 };
 
-export default DashboardPage; 
+export default DashboardPage;
