@@ -1,4 +1,4 @@
-import { localDB } from './local-storage-db';
+import { apiClient, handleApiResponse } from './api-client';
 import { Category as CategoryType } from '../types';
 
 export interface Category {
@@ -13,8 +13,8 @@ export interface Category {
 
 export async function getCategories(userId?: string): Promise<CategoryType[]> {
   try {
-    const categories = localDB.findAll<CategoryType>('categories');
-    return categories.sort((a, b) => a.name.localeCompare(b.name));
+    const response = await apiClient.get<CategoryType[]>('/categories');
+    return handleApiResponse(response);
   } catch (error) {
     console.error('Failed to load categories:', error);
     throw error;
@@ -23,7 +23,7 @@ export async function getCategories(userId?: string): Promise<CategoryType[]> {
 
 export async function createCategory(category: Partial<CategoryType>, userId?: string): Promise<CategoryType> {
   try {
-    const newCategory = localDB.create<CategoryType>('categories', {
+    const response = await apiClient.post<CategoryType>('/categories', {
       name: category.name!,
       color: category.color!,
       icon: category.icon!,
@@ -31,7 +31,7 @@ export async function createCategory(category: Partial<CategoryType>, userId?: s
       user_id: userId,
     });
 
-    return newCategory;
+    return handleApiResponse(response);
   } catch (error) {
     console.error('Failed to create category:', error);
     throw error;
@@ -40,12 +40,8 @@ export async function createCategory(category: Partial<CategoryType>, userId?: s
 
 export async function updateCategory(categoryId: string, updates: Partial<CategoryType>): Promise<CategoryType> {
   try {
-    const updatedCategory = localDB.update<CategoryType>('categories', categoryId, updates);
-    if (!updatedCategory) {
-      throw new Error('Category not found');
-    }
-
-    return updatedCategory;
+    const response = await apiClient.patch<CategoryType>(`/categories/${categoryId}`, updates);
+    return handleApiResponse(response);
   } catch (error) {
     console.error('Failed to update category:', error);
     throw error;
@@ -54,10 +50,8 @@ export async function updateCategory(categoryId: string, updates: Partial<Catego
 
 export async function deleteCategory(categoryId: string): Promise<void> {
   try {
-    const deleted = localDB.delete('categories', categoryId);
-    if (!deleted) {
-      throw new Error('Category not found');
-    }
+    const response = await apiClient.delete(`/categories/${categoryId}`);
+    handleApiResponse(response);
   } catch (error) {
     console.error('Failed to delete category:', error);
     throw error;
@@ -66,21 +60,13 @@ export async function deleteCategory(categoryId: string): Promise<void> {
 
 export async function getCategoryExpenses(categoryId: string, date: Date, userId?: string): Promise<number> {
   try {
-    // Get month start and end dates
-    const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
-    const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-    // Get all transactions for this category
-    const transactions = localDB.findWhere('transactions', (tx: any) => 
-      tx.category_id === categoryId && 
-      tx.type === 'expense' &&
-      new Date(tx.date) >= monthStart &&
-      new Date(tx.date) <= monthEnd
-    );
-
-    // Sum up all expenses
-    const totalExpense = transactions.reduce((sum, transaction: any) => sum + transaction.amount, 0);
-    return totalExpense;
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    
+    const response = await apiClient.get<{ total_expenses: number }>(`/categories/${categoryId}/expenses?year=${year}&month=${month}`);
+    const result = handleApiResponse(response);
+    
+    return result.total_expenses || 0;
   } catch (error) {
     console.error('Failed to get category expenses:', error);
     throw error;
@@ -92,17 +78,17 @@ export async function checkCategoryLimit(categoryId: string, amount: number): Pr
   currentTotal: number;
   limit?: number;
 }> {
-  // Get category details
-  const category = localDB.findById<CategoryType>('categories', categoryId);
-  if (!category?.monthly_limit) return { isOverLimit: false, currentTotal: 0 };
-
-  // Get current month's expenses
-  const currentTotal = await getCategoryExpenses(categoryId, new Date());
-  const newTotal = currentTotal + amount;
-
-  return {
-    isOverLimit: newTotal > category.monthly_limit,
-    currentTotal: newTotal,
-    limit: category.monthly_limit
-  };
+  try {
+    const response = await apiClient.post<{
+      isOverLimit: boolean;
+      currentTotal: number;
+      limit?: number;
+    }>(`/categories/${categoryId}/check-limit`, { amount });
+    
+    return handleApiResponse(response);
+  } catch (error) {
+    console.error('Failed to check category limit:', error);
+    // Return safe defaults on error
+    return { isOverLimit: false, currentTotal: 0 };
+  }
 }
