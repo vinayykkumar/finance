@@ -92,13 +92,13 @@ const MainLayout: React.FC = () => {
       
       {/* Top Navigation Header */}
       <motion.header 
-        className="sticky top-0 z-50 border-b border-white/10 bg-gray-950/80 backdrop-blur-2xl"
+        className="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
       >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <motion.div 
               className="flex items-center gap-3"
@@ -106,20 +106,19 @@ const MainLayout: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-2.5 rounded-xl shadow-lg neon-primary">
-                <Wallet className="h-5 w-5 text-white" />
+              <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-1.5 rounded-lg">
+                <Wallet className="h-4 w-4 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-black text-gradient-hero">
+                <h1 className="text-base font-bold text-gray-900 dark:text-white">
                   FinTrack
                 </h1>
-                <div className="text-xs text-gray-400 -mt-1">Personal Finance</div>
               </div>
             </motion.div>
 
             {/* Desktop Navigation */}
             <motion.nav 
-              className="hidden lg:flex items-center gap-1 bg-white/5 rounded-2xl p-1.5 border border-white/10"
+              className="hidden lg:flex items-center gap-1"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
@@ -128,28 +127,19 @@ const MainLayout: React.FC = () => {
                 <motion.button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`relative px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                  className={`relative px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                     activeTab === item.id
-                      ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-lg shadow-sky-500/25'
-                      : 'text-gray-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + index * 0.05, duration: 0.3 }}
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   {item.icon}
-                  <span className="hidden xl:inline">{item.label}</span>
-                  
-                  {/* Active indicator */}
-                  {activeTab === item.id && (
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-sky-500 to-blue-500 rounded-xl -z-10"
-                      layoutId="activeTab"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
+                  <span className="hidden xl:inline text-xs">{item.label}</span>
                 </motion.button>
               ))}
             </motion.nav>
@@ -160,16 +150,16 @@ const MainLayout: React.FC = () => {
               <div className="relative">
                 <motion.button
                   onClick={() => setShowMonthSelector(!showMonthSelector)}
-                  className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium 
-                           bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 
-                           backdrop-blur-xl transition-all duration-300"
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium 
+                           text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white 
+                           hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.5 }}
                   whileHover={{ scale: 1.02 }}
                 >
                   {format(selectedMonth, 'MMM yyyy')}
-                  <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${showMonthSelector ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${showMonthSelector ? 'rotate-180' : ''}`} />
                 </motion.button>
 
                 {/* Month Selector Dropdown */}
@@ -182,7 +172,7 @@ const MainLayout: React.FC = () => {
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="bg-gray-900/95 backdrop-blur-2xl rounded-2xl border border-white/10 p-4 shadow-2xl">
+                      <div className="bg-white dark:bg-gray-900 backdrop-blur-xl rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-xl">
                         <CompactMonthSelector
                           selectedMonth={selectedMonth}
                           onChange={(month) => {
@@ -200,9 +190,9 @@ const MainLayout: React.FC = () => {
               {/* Dark Mode Toggle */}
               <motion.button
                 onClick={toggleDarkMode}
-                className="p-2.5 rounded-xl transition-all duration-300 border 
-                         bg-white/5 border-white/10 text-gray-300 hover:text-white hover:bg-white/10 
-                         backdrop-blur-xl"
+                className="p-1.5 rounded-lg transition-all duration-200
+                         text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white 
+                         hover:bg-gray-100 dark:hover:bg-gray-800"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, rotate: -180 }}
@@ -215,8 +205,9 @@ const MainLayout: React.FC = () => {
               {/* Mobile Menu Button */}
               <motion.button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 
-                         text-gray-300 hover:text-white hover:bg-white/10 backdrop-blur-xl transition-all duration-200"
+                className="lg:hidden p-1.5 rounded-lg 
+                         text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white 
+                         hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7, duration: 0.5 }}
@@ -231,7 +222,7 @@ const MainLayout: React.FC = () => {
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
-              className="lg:hidden border-t border-white/10 bg-gray-950/95 backdrop-blur-2xl"
+              className="lg:hidden border-t border-gray-200 dark:border-gray-800 bg-white/95 dark:bg-gray-950/95 backdrop-blur-xl"
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -243,10 +234,10 @@ const MainLayout: React.FC = () => {
                     <motion.button
                       key={item.id}
                       onClick={() => handleTabChange(item.id)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                         activeTab === item.id
-                          ? 'bg-gradient-to-r from-sky-500 to-blue-500 text-white'
-                          : 'text-gray-300 hover:text-white hover:bg-white/10'
+                          ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
@@ -259,7 +250,7 @@ const MainLayout: React.FC = () => {
                 </div>
                 
                 {/* Mobile Month Selector */}
-                <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
                   <CompactMonthSelector
                     selectedMonth={selectedMonth}
                     onChange={setSelectedMonth}

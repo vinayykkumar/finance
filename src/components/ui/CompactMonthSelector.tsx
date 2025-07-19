@@ -29,11 +29,11 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
       transition={{ duration: 0.3 }}
       className={`w-full ${
         darkMode 
-          ? 'bg-white/5 border border-white/10' 
+          ? 'bg-gray-800 border border-gray-700' 
           : 'bg-white border border-gray-200'
-      } backdrop-blur-xl rounded-xl overflow-hidden`}
+      } rounded-lg overflow-hidden shadow-sm`}
     >
-      <div className="px-4 py-3 flex justify-between items-center border-b border-white/10">
+      <div className="px-3 py-2 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
         <span className={`flex items-center gap-1.5 text-xs ${
           darkMode ? 'text-gray-400' : 'text-gray-600'
         }`}>
@@ -42,13 +42,13 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
         </span>
       </div>
       
-      <div className="px-4 py-4">
+      <div className="px-3 py-3">
         <div className="flex items-center justify-between">
           <button
             onClick={handlePreviousMonth}
             className={`p-1.5 rounded-full ${
               darkMode
-                ? 'bg-white/10 hover:bg-white/20 text-gray-300' 
+                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
             } transition-colors`}
           >
@@ -79,7 +79,7 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
             onClick={handleNextMonth}
             className={`p-1.5 rounded-full ${
               darkMode
-                ? 'bg-white/10 hover:bg-white/20 text-gray-300' 
+                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
             } transition-colors`}
           >
@@ -101,10 +101,10 @@ const CompactMonthSelector: React.FC<CompactMonthSelectorProps> = ({
                 className={`py-1 px-1 text-xs rounded ${
                   isSelected
                     ? darkMode
-                      ? 'bg-sky-500 text-white'
+                      ? 'bg-gray-900 text-white'
                       : 'bg-sky-500 text-white'
                     : darkMode
-                      ? 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 } transition-colors`}
               >
