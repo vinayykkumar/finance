@@ -77,6 +77,9 @@ export default {
         'pulse-slow': 'pulse 3s infinite ease-in-out',
         'float': 'float 6s infinite ease-in-out',
         'shimmer': 'shimmer 2s infinite linear',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+        'bounce-slow': 'bounce 3s infinite',
+        'spin-slow': 'spin 3s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -99,11 +102,17 @@ export default {
           '0%': { backgroundPosition: '-1000px 0' },
           '100%': { backgroundPosition: '1000px 0' },
         },
+        glow: {
+          '0%': { boxShadow: '0 0 20px rgba(124, 109, 241, 0.3)' },
+          '100%': { boxShadow: '0 0 40px rgba(124, 109, 241, 0.6)' },
+        },
       },
       boxShadow: {
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         'card-active': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'neon': '0 0 20px rgba(124, 109, 241, 0.4), 0 0 40px rgba(124, 109, 241, 0.2)',
+        'neon-hover': '0 0 30px rgba(124, 109, 241, 0.6), 0 0 60px rgba(124, 109, 241, 0.3)',
       },
       transitionProperty: {
         'height': 'height',
@@ -112,6 +121,8 @@ export default {
       transitionTimingFunction: {
         'bounce-in': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
         'bounce-out': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'elastic': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
       },
       backdropBlur: {
         'xs': '2px',
@@ -120,6 +131,7 @@ export default {
         'lg': '12px',
         'xl': '16px',
         '2xl': '24px',
+        '3xl': '40px',
       },
     },
   },

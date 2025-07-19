@@ -78,18 +78,18 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 ${
+    <div className={`min-h-screen transition-all duration-700 ${
       darkMode 
-        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+        ? 'bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900' 
+        : 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50'
     }`}>
       {/* Header */}
       <motion.header 
         className={`sticky top-0 z-30 ${
           darkMode 
-            ? 'bg-gray-900/80 border-gray-700/50' 
-            : 'bg-white/80 border-gray-200/50'
-        } backdrop-filter backdrop-blur-md border-b transition-all duration-500`}
+            ? 'bg-slate-900/90 border-slate-700/50' 
+            : 'bg-white/90 border-gray-200/50'
+        } backdrop-filter backdrop-blur-xl border-b transition-all duration-700 shadow-lg`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -113,17 +113,15 @@ const MainLayout: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-xl shadow-lg">
+              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-3 rounded-2xl shadow-xl neon-glow">
                 <Wallet className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className={`text-xl font-bold ${
-                  darkMode ? 'text-white' : 'text-gray-800'
-                }`}>
+                <h1 className="text-xl font-bold gradient-text">
                   FinTrack
                 </h1>
                 <p className={`text-xs ${
-                  darkMode ? 'text-gray-400' : 'text-gray-500'
+                  darkMode ? 'text-slate-400' : 'text-slate-600'
                 }`}>
                   Personal Finance Manager
                 </p>
@@ -133,10 +131,10 @@ const MainLayout: React.FC = () => {
 
           <div className="flex items-center gap-3">
             <motion.div 
-              className={`hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium ${
+              className={`hidden sm:block px-4 py-2 rounded-2xl text-sm font-semibold glass-card ${
                 darkMode 
-                  ? 'bg-gray-800 text-gray-300' 
-                  : 'bg-gray-100 text-gray-600'
+                  ? 'text-slate-200' 
+                  : 'text-slate-700'
               }`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -147,11 +145,11 @@ const MainLayout: React.FC = () => {
             
             <motion.button
               onClick={toggleDarkMode}
-              className={`p-2.5 rounded-xl transition-all duration-300 ${
+              className={`p-3 rounded-2xl transition-all duration-300 glass-card neon-glow ${
                 darkMode 
-                  ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-              } shadow-sm hover:shadow-md`}
+                  ? 'text-yellow-400 hover:text-yellow-300' 
+                  : 'text-slate-600 hover:text-slate-700'
+              } hover:scale-110`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, rotate: -180 }}

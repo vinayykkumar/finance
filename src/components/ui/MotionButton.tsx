@@ -42,25 +42,27 @@ const MotionButton: React.FC<MotionButtonProps> = ({
   return (
     <motion.button
       type={type}
-      className={`px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-sm 
-                hover:shadow-md transition-all duration-300 font-medium
-                backdrop-filter backdrop-blur-sm relative overflow-hidden
+      className={`px-6 py-3 rounded-2xl flex items-center gap-3 shadow-lg 
+                hover:shadow-xl transition-all duration-300 font-semibold
+                backdrop-filter backdrop-blur-md relative overflow-hidden
+                border border-white/20 hover:border-white/30
                 ${variantClasses} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      whileHover={{ scale: 1.03 }}
+      whileHover={{ scale: 1.05, y: -2 }}
       whileTap={{ scale: 0.97 }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
     >
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 flex items-center gap-3">{children}</span>
       <motion.span 
-        className="absolute inset-0 bg-white opacity-0 rounded-xl"
+        className="absolute inset-0 bg-white opacity-0 rounded-2xl"
         initial={{ scale: 0, opacity: 0 }}
-        whileTap={{ scale: 1.5, opacity: 0.3 }}
+        whileTap={{ scale: 1.5, opacity: 0.2 }}
         transition={{ duration: 0.4 }}
       />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
     </motion.button>
   );
 };

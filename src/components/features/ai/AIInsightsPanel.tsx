@@ -86,42 +86,42 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({ formatIndianCurrency 
 
   return (
     <motion.div
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      className="glass-card rounded-3xl shadow-2xl border border-purple-200/30 dark:border-purple-700/30 overflow-hidden neon-glow"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
     >
       {/* Header */}
-      <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">
+      <div className="p-8 border-b border-purple-100/50 dark:border-purple-700/50 bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 dark:from-purple-900/30 dark:via-blue-900/30 dark:to-indigo-900/30 backdrop-blur-xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-2 rounded-lg">
-              <Brain className="h-6 w-6 text-white" />
+            <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 p-3 rounded-2xl shadow-xl neon-glow">
+              <Brain className="h-8 w-8 text-white drop-shadow-lg" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+              <h3 className="text-2xl font-black gradient-text flex items-center gap-3">
                 AI Financial Insights
-                <Sparkles className="h-5 w-5 text-purple-500" />
+                <Sparkles className="h-6 w-6 text-purple-500 animate-pulse" />
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-base text-gray-700 dark:text-gray-300 font-medium">
                 Powered by intelligent analysis of your spending patterns
               </p>
             </div>
           </div>
           <motion.button
             onClick={loadAIData}
-            className="p-2 bg-white dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+            className="p-3 glass-card rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 neon-glow"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             disabled={loading}
           >
-            <RefreshCw className={`h-5 w-5 text-gray-600 dark:text-gray-400 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-6 w-6 text-purple-600 dark:text-purple-400 ${loading ? 'animate-spin' : ''}`} />
           </motion.button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-100 dark:border-gray-700">
+      <div className="flex border-b border-purple-100/50 dark:border-purple-700/50 bg-gradient-to-r from-white/50 to-purple-50/50 dark:from-gray-800/50 dark:to-purple-900/20">
         {[
           { id: 'insights', label: 'Insights', count: insights.length },
           { id: 'predictions', label: 'Predictions', count: predictions.length },
@@ -130,18 +130,18 @@ const AIInsightsPanel: React.FC<AIInsightsPanelProps> = ({ formatIndianCurrency 
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-6 py-4 text-sm font-bold transition-all duration-300 ${
               activeTab === tab.id
-                ? 'text-purple-600 dark:text-purple-400 border-b-2 border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                ? 'text-purple-600 dark:text-purple-400 border-b-4 border-purple-500 bg-gradient-to-t from-purple-100/80 to-transparent dark:from-purple-900/40 dark:to-transparent shadow-inner'
+                : 'text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50/50 dark:hover:bg-purple-900/20'
             }`}
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+              <span className={`ml-3 px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
                 activeTab === tab.id
-                  ? 'bg-purple-100 dark:bg-purple-800 text-purple-600 dark:text-purple-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                  ? 'bg-gradient-to-r from-purple-200 to-purple-300 dark:from-purple-800 dark:to-purple-700 text-purple-700 dark:text-purple-200'
+                  : 'bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300'
               }`}>
                 {tab.count}
               </span>

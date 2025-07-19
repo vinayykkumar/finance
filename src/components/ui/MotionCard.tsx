@@ -16,27 +16,29 @@ const MotionCard: React.FC<MotionCardProps> = ({
 }) => {
   return (
     <motion.div
-      className={`bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 
-                dark:border-gray-700 hover:shadow-lg transition-all duration-300 
-                backdrop-blur-md bg-opacity-80 dark:bg-opacity-80 
-                hover:bg-opacity-100 dark:hover:bg-opacity-100 
+      className={`glass-card rounded-3xl shadow-xl border border-white/20 dark:border-gray-700/20 
+                hover:shadow-2xl transition-all duration-500 
+                backdrop-blur-xl bg-white/80 dark:bg-gray-800/80 
+                hover:bg-white/90 dark:hover:bg-gray-800/90 
                 relative overflow-hidden ${className}`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ 
-        duration: 0.3,
+        duration: 0.5,
         delay: delay,
         ease: "easeOut"
       }}
       whileHover={{ 
-        scale: 1.02,
-        boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-        transition: { duration: 0.2 }
+        scale: 1.03,
+        y: -8,
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        transition: { duration: 0.3 }
       }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent dark:from-white/5 dark:to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-purple-500/5 dark:from-white/5 dark:to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity duration-500"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-blue-500/5 dark:to-blue-500/10 opacity-0 hover:opacity-100 transition-opacity duration-700"></div>
       {children}
     </motion.div>
   );
