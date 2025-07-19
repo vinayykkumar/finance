@@ -157,6 +157,30 @@
            dark:hover:scrollbar-thumb-primary-500;
   }
   
+  /* Smooth page transitions */
+  .page-transition {
+    @apply transition-all duration-500 ease-in-out;
+  }
+  
+  /* Enhanced focus states */
+  .focus-ring-enhanced {
+    @apply focus:outline-none focus:ring-4 focus:ring-sky-500/20 focus:border-sky-500 
+           transition-all duration-300;
+  }
+  
+  /* Skeleton loading */
+  .skeleton {
+    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 
+           dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 rounded-lg;
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
   /* New enhanced styles */
   .glass-card {
     @apply bg-white/10 dark:bg-gray-900/10 backdrop-blur-2xl border border-white/20 

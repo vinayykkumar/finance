@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { useToast } from '../components/ui/ToastContainer';
 import { 
   Bank, Transaction, Category, CreditCard, Budget, 
   Goal, Investment, InvestmentAccount, Template, CategorySpending 
@@ -68,6 +69,8 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
+  const { showSuccess, showError } = useToast();
+  
   // Data states
   const [banks, setBanks] = useState<Bank[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -108,8 +111,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function addBank(name: string, balance: number) {
     try {
       await addBankService(name, balance);
+      showSuccess('Bank Added', `${name} has been added successfully`);
     } catch (error) {
       console.error("Error adding bank:", error);
+      showError('Failed to Add Bank', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -117,8 +122,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function deleteBank(id: string) {
     try {
       await deleteBankService(id);
+      showSuccess('Bank Deleted', 'Bank account has been removed');
     } catch (error) {
       console.error("Error deleting bank:", error);
+      showError('Failed to Delete Bank', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -126,8 +133,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function addCreditCard(name: string, limit: number) {
     try {
       await addCreditCardService(name, limit);
+      showSuccess('Credit Card Added', `${name} has been added successfully`);
     } catch (error) {
       console.error("Error adding credit card:", error);
+      showError('Failed to Add Credit Card', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -135,8 +144,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function deleteCreditCard(id: string) {
     try {
       await deleteCreditCardService(id);
+      showSuccess('Credit Card Deleted', 'Credit card has been removed');
     } catch (error) {
       console.error("Error deleting credit card:", error);
+      showError('Failed to Delete Credit Card', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -144,8 +155,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function createTransaction(transaction: Transaction | Omit<Transaction, 'id' | 'created_at'>) {
     try {
       await createTransactionService(transaction);
+      showSuccess('Transaction Added', 'Transaction has been recorded successfully');
     } catch (error) {
       console.error("Error creating transaction:", error);
+      showError('Failed to Add Transaction', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -153,8 +166,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function deleteTransaction(id: string) {
     try {
       await deleteTransactionService(id);
+      showSuccess('Transaction Deleted', 'Transaction has been removed');
     } catch (error) {
       console.error("Error deleting transaction:", error);
+      showError('Failed to Delete Transaction', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -165,8 +180,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         throw new Error("Name, color, and icon are required for a category");
       }
       await createCategoryService(category);
+      showSuccess('Category Created', `${category.name} category has been added`);
     } catch (error) {
       console.error("Error creating category:", error);
+      showError('Failed to Create Category', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -174,8 +191,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function deleteCategory(id: string) {
     try {
       await deleteCategoryService(id);
+      showSuccess('Category Deleted', 'Category has been removed');
     } catch (error) {
       console.error("Error deleting category:", error);
+      showError('Failed to Delete Category', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }
@@ -183,8 +202,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   async function updateCategory(id: string, updates: Partial<Category>) {
     try {
       await updateCategoryService(id, updates);
+      showSuccess('Category Updated', 'Category has been updated successfully');
     } catch (error) {
       console.error("Error updating category:", error);
+      showError('Failed to Update Category', error instanceof Error ? error.message : 'Unknown error');
       throw error;
     }
   }

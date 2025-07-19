@@ -8,6 +8,8 @@ import {
 import { format } from 'date-fns';
 import { useData } from '../../providers/DataProvider';
 import MotionButton from '../../components/ui/MotionButton';
+import SearchBar from '../../components/ui/SearchBar';
+import EmptyState from '../../components/ui/EmptyState';
 import { Transaction } from '../../types';
 import SmartTransactionForm from '../../components/features/ai/SmartTransactionForm';
 
@@ -46,17 +48,29 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [showSmartForm, setShowSmartForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filter transactions for the selected month
   const filteredTransactions = useMemo(() => {
-    return transactions.filter((transaction) => {
+    let filtered = transactions.filter((transaction) => {
       const transactionDate = new Date(transaction.date);
       return (
         transactionDate.getMonth() === selectedMonth.getMonth() &&
         transactionDate.getFullYear() === selectedMonth.getFullYear()
       );
     });
-  }, [transactions, selectedMonth]);
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(transaction =>
+        transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        banks.find(b => b.id === transaction.bank_id)?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        categories.find(c => c.id === transaction.category_id)?.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [transactions, selectedMonth, searchQuery, banks, categories]);
 
   // Sort transactions
   const sortedTransactions = useMemo(() => {
@@ -197,6 +211,15 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
           </div>
         </div>
         
+        {/* Search Bar */}
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+          <SearchBar
+            placeholder="Search transactions, banks, or categories..."
+            onSearch={setSearchQuery}
+            className="max-w-md"
+          />
+        </div>
+        
         {/* Smart Transaction Form */}
         {showSmartForm && (
           <motion.div
@@ -218,25 +241,16 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
         
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {sortedTransactions.length === 0 ? (
-            <motion.div 
-              className="p-8 text-center text-gray-500 dark:text-gray-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-            >
-              <div className="mx-auto w-16 h-16 mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
-                <ArrowUpDown className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-              </div>
-              <p className="text-lg font-medium">No transactions for {format(selectedMonth, "MMMM yyyy")}</p>
-              <p className="mt-1 mb-4">Add a transaction or change the selected month</p>
-              <MotionButton
-                onClick={() => setIsModalOpen(true)}
-                variant="primary"
-              >
-                <Plus className="h-4 w-4" />
-                Add Transaction
-              </MotionButton>
-            </motion.div>
+            <EmptyState
+              icon={ArrowUpDown}
+              title={searchQuery ? "No transactions found" : `No transactions for ${format(selectedMonth, "MMMM yyyy")}`}
+              description={searchQuery ? "Try adjusting your search terms" : "Add a transaction or change the selected month"}
+              action={{
+                label: "Add Transaction",
+                onClick: () => setIsModalOpen(true)
+              }}
+              className="p-8"
+            />
           ) : (
             sortedTransactions.map((transaction) => (
               <div
