@@ -1,88 +1,232 @@
-import { apiClient, handleApiResponse } from './api-client';
-import { Transaction as TransactionType } from '../types';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  LayoutDashboard, 
+  Wallet, 
+  ArrowUpDown, 
+  Tag, 
+  PiggyBank, 
+  Target, 
+  TrendingUp, 
+  BarChart3, 
+  Menu, 
+  X, 
+  Sun, 
+  Moon 
+} from 'lucide-react';
+import { format } from 'date-fns';
 
-export interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  type: 'expense' | 'income' | 'transfer';
-  category_id?: string;
-  bank_id: string;
-  to_bank_id?: string; // For transfer transactions
-  date: string;
-  user_id?: string;
-  created_at: string;
-}
+import { useTheme } from '../../providers/ThemeProvider';
+import { useLayout } from '../../providers/LayoutProvider';
+import AnimatedSidebar from './AnimatedSidebar';
+import CompactMonthSelector from '../ui/CompactMonthSelector';
 
-export async function createTransaction(transaction: TransactionType | Omit<TransactionType, 'id' | 'created_at'>): Promise<TransactionType> {
-  try {
-    // Input validation
-    if (isNaN(transaction.amount) || transaction.amount <= 0) {
-      throw new Error('Transaction amount must be a positive number');
+// Import page components
+import DashboardPage from '../../routes/dashboard/DashboardPage';
+import AccountsPage from '../../routes/accounts/AccountsPage';
+import TransactionsPage from '../../routes/transactions/TransactionsPage';
+import CategoriesPage from '../../routes/categories/CategoriesPage';
+import BudgetsPage from '../../routes/budgets/BudgetsPage';
+import GoalsPage from '../../routes/goals/GoalsPage';
+import InvestmentsPage from '../../routes/investments/InvestmentsPage';
+import ReportsPage from '../../routes/reports/ReportsPage';
+
+import { TabType } from '../../types';
+
+const MainLayout: React.FC = () => {
+  const { darkMode, toggleDarkMode } = useTheme();
+  const { activeTab, setActiveTab, mobileMenuOpen, setMobileMenuOpen } = useLayout();
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const sidebarItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+    { id: 'accounts', label: 'Accounts', icon: <Wallet size={20} /> },
+    { id: 'transactions', label: 'Transactions', icon: <ArrowUpDown size={20} /> },
+    { id: 'categories', label: 'Categories', icon: <Tag size={20} /> },
+    { id: 'budgets', label: 'Budgets', icon: <PiggyBank size={20} /> },
+    { id: 'goals', label: 'Goals', icon: <Target size={20} /> },
+    { id: 'investments', label: 'Investments', icon: <TrendingUp size={20} /> },
+    { id: 'reports', label: 'Reports', icon: <BarChart3 size={20} /> },
+  ];
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId as TabType);
+    setMobileMenuOpen(false);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <DashboardPage selectedMonth={selectedMonth} />;
+      case 'accounts':
+        return <AccountsPage />;
+      case 'transactions':
+        return <TransactionsPage selectedMonth={selectedMonth} />;
+      case 'categories':
+        return <CategoriesPage />;
+      case 'budgets':
+        return <BudgetsPage selectedMonth={selectedMonth} />;
+      case 'goals':
+        return <GoalsPage />;
+      case 'investments':
+        return <InvestmentsPage />;
+      case 'reports':
+        return <ReportsPage selectedMonth={selectedMonth} />;
+      default:
+        return <DashboardPage selectedMonth={selectedMonth} />;
     }
-    
-    if (!transaction.bank_id) {
-      throw new Error('Bank account is required');
-    }
-    
-    if (transaction.type === 'transfer' && !transaction.to_bank_id) {
-      throw new Error('Destination account is required for transfers');
-    }
+  };
 
-    const response = await apiClient.post<TransactionType>('/transactions', {
-      description: transaction.description || '',
-      amount: transaction.amount,
-      type: transaction.type,
-      category_id: transaction.category_id,
-      date: transaction.date,
-      bank_id: transaction.bank_id,
-      to_bank_id: transaction.to_bank_id,
-      user_id: transaction.user_id,
-    });
+  return (
+    <div className={`min-h-screen transition-colors duration-500 ${
+      darkMode 
+        ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+        : 'bg-gradient-to-br from-gray-50 via-white to-gray-100'
+    }`}>
+      {/* Header */}
+      <motion.header 
+        className={`sticky top-0 z-30 ${
+          darkMode 
+            ? 'bg-gray-900/80 border-gray-700/50' 
+            : 'bg-white/80 border-gray-200/50'
+        } backdrop-filter backdrop-blur-md border-b transition-all duration-500`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`md:hidden p-2 rounded-lg transition-colors ${
+                darkMode 
+                  ? 'hover:bg-gray-700 text-gray-300' 
+                  : 'hover:bg-gray-100 text-gray-600'
+              }`}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            
+            <motion.div 
+              className="flex items-center gap-3"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-xl shadow-lg">
+                <Wallet className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className={`text-xl font-bold ${
+                  darkMode ? 'text-white' : 'text-gray-800'
+                }`}>
+                  FinTrack
+                </h1>
+                <p className={`text-xs ${
+                  darkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  Personal Finance Manager
+                </p>
+              </div>
+            </motion.div>
+          </div>
 
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to create transaction:', error);
-    throw error;
-  }
-}
+          <div className="flex items-center gap-3">
+            <motion.div 
+              className={`hidden sm:block px-3 py-1.5 rounded-lg text-sm font-medium ${
+                darkMode 
+                  ? 'bg-gray-800 text-gray-300' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              {format(selectedMonth, 'MMMM yyyy')}
+            </motion.div>
+            
+            <motion.button
+              onClick={toggleDarkMode}
+              className={`p-2.5 rounded-xl transition-all duration-300 ${
+                darkMode 
+                  ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+              } shadow-sm hover:shadow-md`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, rotate: -180 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </motion.button>
+          </div>
+        </div>
+      </motion.header>
 
-export async function deleteTransaction(id: string): Promise<void> {
-  try {
-    console.log('Deleting transaction with ID:', id);
+      <div className="flex">
+        {/* Mobile Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
 
-    const response = await apiClient.delete(`/transactions/${id}`);
-    handleApiResponse(response);
+        {/* Sidebar */}
+        <motion.div
+          className={`fixed md:relative z-50 md:z-auto ${
+            mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          } transition-transform duration-300 ease-in-out`}
+          initial={{ x: -300 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <AnimatedSidebar
+            items={sidebarItems}
+            activeId={activeTab}
+            onItemClick={handleTabChange}
+            isOpen={mobileMenuOpen}
+            darkMode={darkMode}
+            className="h-[calc(100vh-4rem)]"
+          >
+            <CompactMonthSelector
+              selectedMonth={selectedMonth}
+              onChange={setSelectedMonth}
+              darkMode={darkMode}
+            />
+          </AnimatedSidebar>
+        </motion.div>
 
-    console.log('Transaction deleted successfully');
-  } catch (error) {
-    console.error('Detailed error:', error);
-    if (error instanceof Error) {
-      throw error;
-    } else if (typeof error === 'object' && error !== null) {
-      throw new Error(JSON.stringify(error));
-    } else {
-      throw new Error('An unknown error occurred');
-    }
-  }
-}
+        {/* Main Content */}
+        <motion.main 
+          className="flex-1 p-4 md:p-6 overflow-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderContent()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </motion.main>
+      </div>
+    </div>
+  );
+};
 
-export async function getTransactions(userId?: string): Promise<TransactionType[]> {
-  try {
-    const response = await apiClient.get<TransactionType[]>('/transactions');
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to load transactions:', error);
-    throw error;
-  }
-}
-
-export async function getTransactionsByMonth(year: number, month: number, userId?: string): Promise<TransactionType[]> {
-  try {
-    const response = await apiClient.get<TransactionType[]>(`/transactions?year=${year}&month=${month}`);
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to load transactions by month:', error);
-    throw error;
-  }
-}
+export default MainLayout;
