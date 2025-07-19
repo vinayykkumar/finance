@@ -40,7 +40,6 @@ const MainLayout: React.FC = () => {
   const [showMonthSelector, setShowMonthSelector] = useState(false);
 
   const navigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
     { id: 'accounts', label: 'Accounts', icon: <Wallet size={18} /> },
     { id: 'transactions', label: 'Transactions', icon: <ArrowUpDown size={18} /> },
     { id: 'categories', label: 'Categories', icon: <Tag size={18} /> },
@@ -55,6 +54,10 @@ const MainLayout: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
+  const handleLogoClick = () => {
+    setActiveTab('dashboard');
+    setMobileMenuOpen(false);
+  };
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -101,7 +104,8 @@ const MainLayout: React.FC = () => {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <motion.div 
-              className="flex items-center gap-3"
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleLogoClick}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
@@ -113,6 +117,9 @@ const MainLayout: React.FC = () => {
                 <h1 className="text-base font-bold text-gray-900 dark:text-white">
                   FinTrack
                 </h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
+                  Personal Finance
+                </p>
               </div>
             </motion.div>
 
