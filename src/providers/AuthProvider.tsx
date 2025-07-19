@@ -1,88 +1,93 @@
-import { apiClient, handleApiResponse } from './api-client';
-import { Transaction as TransactionType } from '../types';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export interface Transaction {
+interface User {
   id: string;
-  description: string;
-  amount: number;
-  type: 'expense' | 'income' | 'transfer';
-  category_id?: string;
-  bank_id: string;
-  to_bank_id?: string; // For transfer transactions
-  date: string;
-  user_id?: string;
-  created_at: string;
+  email: string;
+  name?: string;
 }
 
-export async function createTransaction(transaction: TransactionType | Omit<TransactionType, 'id' | 'created_at'>): Promise<TransactionType> {
-  try {
-    // Input validation
-    if (isNaN(transaction.amount) || transaction.amount <= 0) {
-      throw new Error('Transaction amount must be a positive number');
-    }
-    
-    if (!transaction.bank_id) {
-      throw new Error('Bank account is required');
-    }
-    
-    if (transaction.type === 'transfer' && !transaction.to_bank_id) {
-      throw new Error('Destination account is required for transfers');
-    }
-
-    const response = await apiClient.post<TransactionType>('/transactions', {
-      description: transaction.description || '',
-      amount: transaction.amount,
-      type: transaction.type,
-      category_id: transaction.category_id,
-      date: transaction.date,
-      bank_id: transaction.bank_id,
-      to_bank_id: transaction.to_bank_id,
-      user_id: transaction.user_id,
-    });
-
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to create transaction:', error);
-    throw error;
-  }
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name?: string) => Promise<void>;
+  logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  loading: boolean;
 }
 
-export async function deleteTransaction(id: string): Promise<void> {
-  try {
-    console.log('Deleting transaction with ID:', id);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-    const response = await apiClient.delete(`/transactions/${id}`);
-    handleApiResponse(response);
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+}
 
-    console.log('Transaction deleted successfully');
-  } catch (error) {
-    console.error('Detailed error:', error);
-    if (error instanceof Error) {
-      throw error;
-    } else if (typeof error === 'object' && error !== null) {
-      throw new Error(JSON.stringify(error));
-    } else {
-      throw new Error('An unknown error occurred');
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check for existing session
+    const savedUser = localStorage.getItem('auth_user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
     }
-  }
-}
+    setLoading(false);
+  }, []);
 
-export async function getTransactions(userId?: string): Promise<TransactionType[]> {
-  try {
-    const response = await apiClient.get<TransactionType[]>('/transactions');
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to load transactions:', error);
-    throw error;
-  }
-}
+  const login = async (email: string, password: string) => {
+    setLoading(true);
+    try {
+      // Mock login - in real app this would call your auth API
+      const mockUser = { id: '1', email, name: email.split('@')[0] };
+      setUser(mockUser);
+      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+    } catch (error) {
+      throw new Error('Login failed');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-export async function getTransactionsByMonth(year: number, month: number, userId?: string): Promise<TransactionType[]> {
-  try {
-    const response = await apiClient.get<TransactionType[]>(`/transactions?year=${year}&month=${month}`);
-    return handleApiResponse(response);
-  } catch (error) {
-    console.error('Failed to load transactions by month:', error);
-    throw error;
-  }
+  const signup = async (email: string, password: string, name?: string) => {
+    setLoading(true);
+    try {
+      // Mock signup - in real app this would call your auth API
+      const mockUser = { id: '1', email, name: name || email.split('@')[0] };
+      setUser(mockUser);
+      localStorage.setItem('auth_user', JSON.stringify(mockUser));
+    } catch (error) {
+      throw new Error('Signup failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setUser(null);
+    localStorage.removeItem('auth_user');
+  };
+
+  const resetPassword = async (email: string) => {
+    // Mock password reset - in real app this would call your auth API
+    console.log('Password reset requested for:', email);
+  };
+
+  const value = {
+    user,
+    login,
+    signup,
+    logout,
+    resetPassword,
+    loading,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
