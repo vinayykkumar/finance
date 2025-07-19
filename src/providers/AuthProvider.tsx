@@ -1,23 +1,88 @@
-import React, { createContext, useContext } from 'react';
+import { apiClient, handleApiResponse } from './api-client';
+import { Transaction as TransactionType } from '../types';
 
-interface AuthContextType {
-  isAuthenticated: boolean;
+export interface Transaction {
+  id: string;
+  description: string;
+  amount: number;
+  type: 'expense' | 'income' | 'transfer';
+  category_id?: string;
+  bank_id: string;
+  to_bank_id?: string; // For transfer transactions
+  date: string;
+  user_id?: string;
+  created_at: string;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export async function createTransaction(transaction: TransactionType | Omit<TransactionType, 'id' | 'created_at'>): Promise<TransactionType> {
+  try {
+    // Input validation
+    if (isNaN(transaction.amount) || transaction.amount <= 0) {
+      throw new Error('Transaction amount must be a positive number');
+    }
+    
+    if (!transaction.bank_id) {
+      throw new Error('Bank account is required');
+    }
+    
+    if (transaction.type === 'transfer' && !transaction.to_bank_id) {
+      throw new Error('Destination account is required for transfers');
+    }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const value = {
-    isAuthenticated: true, // Always true since authentication is removed
-  };
+    const response = await apiClient.post<TransactionType>('/transactions', {
+      description: transaction.description || '',
+      amount: transaction.amount,
+      type: transaction.type,
+      category_id: transaction.category_id,
+      date: transaction.date,
+      bank_id: transaction.bank_id,
+      to_bank_id: transaction.to_bank_id,
+      user_id: transaction.user_id,
+    });
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    return handleApiResponse(response);
+  } catch (error) {
+    console.error('Failed to create transaction:', error);
+    throw error;
   }
-  return context;
+}
+
+export async function deleteTransaction(id: string): Promise<void> {
+  try {
+    console.log('Deleting transaction with ID:', id);
+
+    const response = await apiClient.delete(`/transactions/${id}`);
+    handleApiResponse(response);
+
+    console.log('Transaction deleted successfully');
+  } catch (error) {
+    console.error('Detailed error:', error);
+    if (error instanceof Error) {
+      throw error;
+    } else if (typeof error === 'object' && error !== null) {
+      throw new Error(JSON.stringify(error));
+    } else {
+      throw new Error('An unknown error occurred');
+    }
+  }
+}
+
+export async function getTransactions(userId?: string): Promise<TransactionType[]> {
+  try {
+    const response = await apiClient.get<TransactionType[]>('/transactions');
+    return handleApiResponse(response);
+  } catch (error) {
+    console.error('Failed to load transactions:', error);
+    throw error;
+  }
+}
+
+export async function getTransactionsByMonth(year: number, month: number, userId?: string): Promise<TransactionType[]> {
+  try {
+    const response = await apiClient.get<TransactionType[]>(`/transactions?year=${year}&month=${month}`);
+    return handleApiResponse(response);
+  } catch (error) {
+    console.error('Failed to load transactions by month:', error);
+    throw error;
+  }
 }
