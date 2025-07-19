@@ -113,14 +113,9 @@ const MainLayout: React.FC = () => {
               <div className="bg-gradient-to-r from-sky-500 to-blue-500 p-1.5 rounded-lg">
                 <Wallet className="h-4 w-4 text-white" />
               </div>
-              <div>
-                <h1 className="text-base font-bold text-gray-900 dark:text-white">
-                  FinTrack
-                </h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400 -mt-1">
-                  Personal Finance
-                </p>
-              </div>
+              <h1 className="text-base font-bold text-gray-900 dark:text-white">
+                FinTrack
+              </h1>
             </motion.div>
 
             {/* Desktop Navigation */}
