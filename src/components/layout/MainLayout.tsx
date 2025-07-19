@@ -220,7 +220,6 @@ const MainLayout: React.FC = () => {
         </motion.main>
       </div>
     </div>
-    </div>
   );
 };
 
