@@ -71,23 +71,34 @@ For detailed database documentation, see `src/db/README.md`.
 ### Prerequisites
 
 - Node.js 16+ and npm
-- Supabase account (or local Supabase instance)
+- Python 3.8+ and pip
+- Supabase account
 
 ### Installation
 
 1. Clone the repository
-2. Install dependencies:
+2. Install frontend dependencies:
    ```
    npm install
    ```
-3. Set up your environment variables (copy `.env.example` to `.env`)
-4. Run migrations (if using Supabase):
+3. Install backend dependencies:
    ```
-   npx supabase db push
+   npm run backend:install
    ```
-5. Start the development server:
+4. Set up your environment variables:
    ```
-   npm run dev
+   cp .env.example .env
+   cp backend/.env.example backend/.env
+   ```
+5. Update `backend/.env` with your Supabase keys
+6. Start both frontend and backend:
+   ```
+   npm start
+   ```
+   Or run them separately:
+   ```
+   npm run dev        # Frontend only
+   npm run backend    # Backend only
    ```
 
 ## Next Steps & Future Improvements

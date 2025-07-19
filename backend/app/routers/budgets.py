@@ -75,11 +75,12 @@ async def update_budget(
 
 @router.delete("/{budget_id}", response_model=APIResponse)
 async def delete_budget(
-    budget_id: str, 
+    request_data: dict,
     budget_service: BudgetService = Depends(get_budget_service)
 ):
     """Delete a budget."""
     try:
+        amount_change = Decimal(str(request_data.get("amount_change", 0)))
         success = await budget_service.delete_budget(budget_id)
         if not success:
             raise HTTPException(status_code=404, detail="Budget not found")

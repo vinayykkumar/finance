@@ -148,16 +148,17 @@ class TransactionService:
     async def _update_balances_for_transaction(self, transaction: Transaction):
         """Update bank balances based on transaction type."""
         try:
+            from decimal import Decimal
             if transaction.type == "expense":
                 # Decrease source bank balance
-                await self.bank_service.update_balance(transaction.bank_id, -transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, -Decimal(str(transaction.amount)))
             elif transaction.type == "income":
                 # Increase source bank balance
-                await self.bank_service.update_balance(transaction.bank_id, transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, Decimal(str(transaction.amount)))
             elif transaction.type == "transfer" and transaction.to_bank_id:
                 # Decrease source bank, increase destination bank
-                await self.bank_service.update_balance(transaction.bank_id, -transaction.amount)
-                await self.bank_service.update_balance(transaction.to_bank_id, transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, -Decimal(str(transaction.amount)))
+                await self.bank_service.update_balance(transaction.to_bank_id, Decimal(str(transaction.amount)))
         except Exception as e:
             print(f"Error updating balances for transaction: {e}")
             raise
@@ -165,16 +166,17 @@ class TransactionService:
     async def _reverse_balances_for_transaction(self, transaction: Transaction):
         """Reverse bank balance changes for a transaction."""
         try:
+            from decimal import Decimal
             if transaction.type == "expense":
                 # Increase source bank balance (reverse decrease)
-                await self.bank_service.update_balance(transaction.bank_id, transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, Decimal(str(transaction.amount)))
             elif transaction.type == "income":
                 # Decrease source bank balance (reverse increase)
-                await self.bank_service.update_balance(transaction.bank_id, -transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, -Decimal(str(transaction.amount)))
             elif transaction.type == "transfer" and transaction.to_bank_id:
                 # Increase source bank, decrease destination bank (reverse transfer)
-                await self.bank_service.update_balance(transaction.bank_id, transaction.amount)
-                await self.bank_service.update_balance(transaction.to_bank_id, -transaction.amount)
+                await self.bank_service.update_balance(transaction.bank_id, Decimal(str(transaction.amount)))
+                await self.bank_service.update_balance(transaction.to_bank_id, -Decimal(str(transaction.amount)))
         except Exception as e:
             print(f"Error reversing balances for transaction: {e}")
             raise

@@ -83,11 +83,12 @@ async def delete_goal(goal_id: str, goal_service: GoalService = Depends(get_goal
 @router.post("/{goal_id}/contribute", response_model=Goal)
 async def contribute_to_goal(
     goal_id: str, 
-    amount: Decimal, 
+    request_data: dict,
     goal_service: GoalService = Depends(get_goal_service)
 ):
     """Add a contribution to a financial goal."""
     try:
+        amount = Decimal(str(request_data.get("amount", 0)))
         goal = await goal_service.contribute_to_goal(goal_id, amount)
         if not goal:
             raise HTTPException(status_code=404, detail="Goal not found")
