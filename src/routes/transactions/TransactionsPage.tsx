@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowUpDown, Trash2, TrendingUp, TrendingDown, X, Plus,
   SortAsc, SortDesc, ArrowUpCircle, ArrowDownCircle, Filter
+  Brain
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useData } from '../../providers/DataProvider';
 import MotionButton from '../../components/ui/MotionButton';
 import { Transaction } from '../../types';
+import SmartTransactionForm from '../../components/features/ai/SmartTransactionForm';
 
 type SortField = 'date' | 'amount' | 'description';
 type SortOrder = 'asc' | 'desc';
@@ -43,6 +45,7 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
   const [categoryWarning, setCategoryWarning] = useState<string>("");
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [showSmartForm, setShowSmartForm] = useState(false);
 
   // Filter transactions for the selected month
   const filteredTransactions = useMemo(() => {
@@ -178,12 +181,41 @@ const TransactionsPage: React.FC<TransactionsPageProps> = ({ selectedMonth }) =>
             <MotionButton
               onClick={() => setIsModalOpen(true)}
               variant="primary"
+              className="mr-2"
             >
               <Plus className="h-4 w-4" />
               Add Transaction
             </MotionButton>
+            <MotionButton
+              onClick={() => setShowSmartForm(!showSmartForm)}
+              variant="info"
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
+              <Brain className="h-4 w-4" />
+              AI Assistant
+            </MotionButton>
           </div>
         </div>
+        
+        {/* Smart Transaction Form */}
+        {showSmartForm && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6"
+          >
+            <SmartTransactionForm
+              categories={categories}
+              onTransactionCreated={async (transaction) => {
+                // You could integrate this with your existing transaction creation logic
+                console.log('Smart transaction created:', transaction);
+                setShowSmartForm(false);
+              }}
+            />
+          </motion.div>
+        )}
+        
         <div className="divide-y divide-gray-100 dark:divide-gray-700">
           {sortedTransactions.length === 0 ? (
             <motion.div 

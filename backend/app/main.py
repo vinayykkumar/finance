@@ -13,6 +13,7 @@ import os
 from dotenv import load_dotenv
 
 from app.routers import banks, categories, transactions, budgets, goals, reports
+from app.routers import ai
 from app.database import init_db
 from app.config import settings
 
@@ -50,6 +51,7 @@ app.include_router(transactions.router, prefix="/api/transactions", tags=["trans
 app.include_router(budgets.router, prefix="/api/budgets", tags=["budgets"])
 app.include_router(goals.router, prefix="/api/goals", tags=["goals"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
+app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
 
 @app.on_event("startup")
 async def startup_event():
