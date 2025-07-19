@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { localDB } from './local-storage-db';
 
 export interface Bank {
   id: string;
@@ -10,24 +10,8 @@ export interface Bank {
 
 export async function getBanks(userId?: string): Promise<Bank[]> {
   try {
-    let query = supabase
-      .from('banks')
-      .select('*')
-      .order('created_at', { ascending: true });
-      
-    // Filter by user_id if provided
-    if (userId) {
-      query = query.eq('user_id', userId);
-    }
-    
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching banks:', error);
-      throw error;
-    }
-
-    return data || [];
+    const banks = localDB.findAll<Bank>('banks');
+    return banks.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   } catch (error) {
     console.error('Failed to load banks:', error);
     throw error;
@@ -38,29 +22,14 @@ export async function addBank(name: string, initialBalance: number, userId?: str
   try {
     console.log('Adding bank with:', { name, initialBalance, userId });
 
-    const { data, error: insertError } = await supabase
-      .from('banks')
-      .insert([
-        {
-          name,
-          balance: initialBalance,
-          user_id: userId
-        },
-      ])
-      .select()
-      .single();
+    const newBank = localDB.create<Bank>('banks', {
+      name,
+      balance: initialBalance,
+      user_id: userId,
+    });
 
-    if (insertError) {
-      console.error('Insert error:', insertError);
-      throw new Error(`Error adding bank: ${insertError.message} (${insertError.code})`);
-    }
-
-    if (!data) {
-      throw new Error('No data returned from Supabase');
-    }
-
-    console.log('Bank added successfully:', data);
-    return data;
+    console.log('Bank added successfully:', newBank);
+    return newBank;
   } catch (error) {
     console.error('Detailed error:', error);
     if (error instanceof Error) {
@@ -75,44 +44,17 @@ export async function addBank(name: string, initialBalance: number, userId?: str
 
 export async function updateBankBalance(bankId: string, amount: number): Promise<void> {
   try {
-    // Use a more atomic approach to prevent race conditions
-    // This uses RPC (Remote Procedure Call) to a PostgreSQL function that handles the update atomically
-    // If your Supabase instance doesn't have this function, we'll fall back to the regular approach
-    const { error: rpcError } = await supabase.rpc('update_bank_balance', {
-      bank_id: bankId,
-      amount_change: amount
+    const bank = localDB.findById<Bank>('banks', bankId);
+    if (!bank) {
+      throw new Error('Bank not found');
+    }
+
+    const updatedBank = localDB.update<Bank>('banks', bankId, {
+      balance: bank.balance + amount,
     });
 
-    // If RPC fails (likely because the function doesn't exist), fall back to the regular approach
-    if (rpcError) {
-      console.warn('RPC update_bank_balance failed, falling back to regular update:', rpcError);
-      
-      // Get latest balance with a FOR UPDATE lock (if supported by your Supabase plan)
-      const { data: bank, error: fetchError } = await supabase
-        .from('banks')
-        .select('balance')
-        .eq('id', bankId)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching bank:', fetchError);
-        throw new Error(`Failed to fetch bank: ${fetchError.message}`);
-      }
-
-      if (!bank) {
-        throw new Error('Bank not found');
-      }
-
-      // Update with new balance
-      const { error: updateError } = await supabase
-        .from('banks')
-        .update({ balance: bank.balance + amount })
-        .eq('id', bankId);
-
-      if (updateError) {
-        console.error('Error updating bank balance:', updateError);
-        throw new Error(`Failed to update bank balance: ${updateError.message}`);
-      }
+    if (!updatedBank) {
+      throw new Error('Failed to update bank balance');
     }
   } catch (error) {
     console.error('Error in updateBankBalance:', error);
@@ -124,27 +66,18 @@ export async function updateBankBalance(bankId: string, amount: number): Promise
 async function deleteAllBankTransactions(bankId: string): Promise<void> {
   console.log('Deleting all transactions for bank ID:', bankId);
   
-  // First delete transactions where this is the source bank
-  const { error: sourceError } = await supabase
-    .from('transactions')
-    .delete()
-    .eq('bank_id', bankId);
+  // Get all transactions
+  const transactions = localDB.findAll('transactions');
   
-  if (sourceError) {
-    console.error('Error deleting source transactions:', sourceError);
-    throw new Error(`Error deleting source transactions: ${sourceError.message}`);
-  }
+  // Filter out transactions related to this bank
+  const transactionsToDelete = transactions.filter(
+    (tx: any) => tx.bank_id === bankId || tx.to_bank_id === bankId
+  );
   
-  // Then delete transactions where this is the destination bank (transfers)
-  const { error: destError } = await supabase
-    .from('transactions')
-    .delete()
-    .eq('to_bank_id', bankId);
-  
-  if (destError) {
-    console.error('Error deleting destination transactions:', destError);
-    throw new Error(`Error deleting destination transactions: ${destError.message}`);
-  }
+  // Delete each transaction
+  transactionsToDelete.forEach((tx: any) => {
+    localDB.delete('transactions', tx.id);
+  });
   
   console.log('Successfully deleted all transactions for bank');
 }
@@ -153,50 +86,23 @@ export async function deleteBank(id: string): Promise<void> {
   try {
     console.log('Deleting bank with ID:', id);
 
-    // First check if there are any transactions associated with this bank
-    const { data: transactions, error: transactionError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('bank_id', id);
-
-    if (transactionError) {
-      console.error('Error checking transactions:', transactionError);
-      throw new Error(`Error checking transactions: ${transactionError.message}`);
-    }
+    // Check if there are any transactions associated with this bank
+    const transactions = localDB.findWhere('transactions', (tx: any) => 
+      tx.bank_id === id || tx.to_bank_id === id
+    );
 
     console.log('Transactions found for bank_id:', id, transactions);
 
-    // Also check if there are any transfers to this bank
-    const { data: transfersTo, error: transfersToError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('to_bank_id', id);
-
-    if (transfersToError) {
-      console.error('Error checking transfers:', transfersToError);
-      throw new Error(`Error checking transfers: ${transfersToError.message}`);
-    }
-
-    console.log('Transfers found to bank_id:', id, transfersTo);
-
-    // If there are transactions or transfers, delete them first
-    if ((transactions && transactions.length > 0) || (transfersTo && transfersTo.length > 0)) {
-      const transactionCount = (transactions?.length || 0) + (transfersTo?.length || 0);
-      console.log(`Found ${transactionCount} transactions to delete first`);
-      
-      // Delete all transactions associated with this bank
+    // If there are transactions, delete them first
+    if (transactions.length > 0) {
+      console.log(`Found ${transactions.length} transactions to delete first`);
       await deleteAllBankTransactions(id);
     }
 
     // Now proceed with bank deletion
-    const { error: deleteError } = await supabase
-      .from('banks')
-      .delete()
-      .eq('id', id);
-
-    if (deleteError) {
-      console.error('Delete error:', deleteError);
-      throw new Error(`Error deleting bank: ${deleteError.message} (${deleteError.code})`);
+    const deleted = localDB.delete('banks', id);
+    if (!deleted) {
+      throw new Error('Bank not found');
     }
 
     console.log('Bank deleted successfully');
@@ -222,24 +128,8 @@ export interface CreditCard {
 
 export async function getCreditCards(userId?: string): Promise<CreditCard[]> {
   try {
-    let query = supabase
-      .from('credit_cards')
-      .select('*')
-      .order('created_at', { ascending: true });
-      
-    // Filter by user_id if provided
-    if (userId) {
-      query = query.eq('user_id', userId);
-    }
-    
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching credit cards:', error);
-      throw error;
-    }
-
-    return data || [];
+    const creditCards = localDB.findAll<CreditCard>('credit_cards');
+    return creditCards.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
   } catch (error) {
     console.error('Failed to load credit cards:', error);
     throw error;
@@ -248,25 +138,14 @@ export async function getCreditCards(userId?: string): Promise<CreditCard[]> {
 
 export async function addCreditCard(name: string, limit: number, userId?: string): Promise<CreditCard> {
   try {
-    const { data, error } = await supabase
-      .from('credit_cards')
-      .insert([
-        {
-          name,
-          limit,
-          balance: 0,
-          user_id: userId
-        },
-      ])
-      .select()
-      .single();
+    const newCreditCard = localDB.create<CreditCard>('credit_cards', {
+      name,
+      limit,
+      balance: 0,
+      user_id: userId,
+    });
 
-    if (error) {
-      console.error('Error adding credit card:', error);
-      throw error;
-    }
-
-    return data;
+    return newCreditCard;
   } catch (error) {
     console.error('Failed to add credit card:', error);
     throw error;
@@ -275,14 +154,9 @@ export async function addCreditCard(name: string, limit: number, userId?: string
 
 export async function deleteCreditCard(id: string): Promise<void> {
   try {
-    const { error } = await supabase
-      .from('credit_cards')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting credit card:', error);
-      throw error;
+    const deleted = localDB.delete('credit_cards', id);
+    if (!deleted) {
+      throw new Error('Credit card not found');
     }
   } catch (error) {
     console.error('Failed to delete credit card:', error);
