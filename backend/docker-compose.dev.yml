@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  fintrack-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: fintrack-backend-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=3001
+      - DEBUG=True
+      - PYTHONPATH=/app
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/__pycache__
+    restart: unless-stopped
+    command: python run.py
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - redis
+
+  # Redis for caching (useful for AI features)
+  redis:
+    image: redis:7-alpine
+    container_name: fintrack-redis-dev
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_dev_data:/data
+
+  # Optional: PostgreSQL for local development (if not using Supabase)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: fintrack-postgres-dev
+  #   environment:
+  #     POSTGRES_DB: fintrack
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_dev_data:/var/lib/postgresql/data
+
+volumes:
+  redis_dev_data:
+  # postgres_dev_data:

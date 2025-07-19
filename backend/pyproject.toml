@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fintrack-backend"
+version = "1.0.0"
+description = "FastAPI backend for FinTrack personal finance application"
+authors = [
+    {name = "FinTrack Team", email = "team@fintrack.com"},
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Framework :: FastAPI",
+]
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn[standard]>=0.24.0",
+    "supabase>=2.0.2",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "python-multipart>=0.0.6",
+    "httpx>=0.25.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "black>=23.11.0",
+    "flake8>=6.1.0",
+    "isort>=5.12.0",
+]
+ai = [
+    "scikit-learn>=1.3.2",
+    "pandas>=2.1.3",
+    "numpy>=1.24.4",
+    "openai>=1.3.5",
+]
+cache = [
+    "redis>=5.0.1",
+]
+monitoring = [
+    "prometheus-client>=0.19.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/fintrack-backend"
+Documentation = "https://github.com/yourusername/fintrack-backend#readme"
+Repository = "https://github.com/yourusername/fintrack-backend.git"
+Issues = "https://github.com/yourusername/fintrack-backend/issues"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["app"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    "venv",
+]
